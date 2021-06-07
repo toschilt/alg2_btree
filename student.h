@@ -15,5 +15,7 @@ typedef struct {
 } studentRegister;
 
 
+//função para imprimir aluno
+
 
 #endif

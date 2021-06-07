@@ -6,19 +6,23 @@
 
 //TAMANHO DA PÁGINA: 4096 Bytes
 #define PAGESIZE 4096
+#define MAXKEYS 204
+// #define QUANTIDADE DE REGISTRO
 
 typedef struct {
+    int success;
     //Estrutura para armazenar possíveis erros (Ideia tirada do PDF do trabalho)
 } Errors;
 
 typedef struct {
-    int key, RRN;
+    int key;
+    long RRN;
 } record;
 
 typedef struct {
     record *records;
     long *childs;
-    int keys;
+    int numRecords;
     char isLeaf;
 } bTreePage;
 
@@ -147,7 +151,7 @@ Errors bTreeInsert(PrimaryIndex *newRecord, bTreePage *root, FILE *bTreeFilePoin
  * Se encontrar a chave, retorna RRN dela
  * Se não encontrar (chegar num nó folha e não estiver lá), retorna -1
 */
-long bTreeSelect(bTreePage *node, int key, FILE* bTreeFilePointer);
+long bTreeSearch(bTreePage *node, int key, FILE* bTreeFilePointer);
 
 
 //Funções antigas:
@@ -164,5 +168,86 @@ long bTreeSelect(bTreePage *node, int key, FILE* bTreeFilePointer);
  * Recursão até encontrar a chave 
 */
 //long bTreeSearch(bTreePage *root, int key, FILE *bTreeFile);
+
+
+/* FUNÇÕES
+
+-- BUSCA -- 
+bTreeSearch(chave);
+abrir o arquivo
+getorcreateroot
+caso necessário, createroot
+
+função recursiva
+bTreePage *_bTreeSearch(pagina p buscar, chave)
+- Verifica se chave está em pagina p buscar com bb
+    - Caso esteja, retorna pagina p buscar
+    
+    - Caso contrário:
+    - Verifica se é folha
+        - Caso seja, retorna nulo
+        
+        - Caso contrário
+        - chama recursão em pagina adequada
+
+se _bTreePage retorna nulo, nao encontrou
+caso contrário
+    - varre a página e retorna o rrn do arquivo de dados
+
+retorna o RRN
+
+
+getOrCreateRoot(arquivo)
+- Abrir o arquivo
+    - Se o arquivo tiver vazio, chama createRoot
+    - Pega o RRN do cabeçalho
+    - abre e retorna a página raiz
+
+
+createRoot(arquivo)
+- Cria o header
+- Aloca uma página e insere no arquivo da btree
+- retorna o ponteiro da pagina alocada
+
+
+buscabinaria(key, vetor de registros, começo, fim)
+verifica se pagina > local de busca / 2
+    caso seja, chama bb em local de busca da direita
+    return buscabinaria(key, vetor, final / 2, final)
+    caso nao seja, chama bb em local de busca da esquerda
+retorna record
+
+
+
+-- INSERIR --
+bTreeSearch(chave);
+abrir o arquivo
+getorcreateroot
+caso necessário, createroot
+
+função recursiva
+bTreePage *_bTreeSearchForInsert(pagina p buscar, chave)
+- Verifica se é folha
+    - Caso seja, retorna a folha
+    - Caso contrário, verifica se a chave está na pagina
+        - Caso esteja, retorna nulo
+        - Caso contrário, chama recursão na pagina adequada
+
+
+se for nulo, retorna erro
+caso contrário, bb para ver se o registro existe
+    - Caso exista retorna erro
+    - Caso contrário
+
+
+
+
+
+
+*/
+
+
+
+
 
 #endif
