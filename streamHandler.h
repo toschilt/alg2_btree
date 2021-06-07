@@ -4,13 +4,6 @@
 #include "student.h"
 #include "btree.h"
 
-#define EXITFUNCTIONNAME "exit"
-#define SEARCHFUNCTIONNAME "search"
-#define INSERTFUNCTIONNAME "insert"
-#define UPDATEFUNCTIONNAME "update"
-
-
-void getFunction();
 
 studentRegister *searchInDataFile(long RRN);
 studentRegister *readStudentFromUser();
