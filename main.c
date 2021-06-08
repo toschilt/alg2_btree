@@ -10,6 +10,7 @@
 #define UPDATEFUNCTIONNAME "update"
 
 
+//ATUALIZAR
 void readString(char *string, char separator) {
     char buf;
     int i = 0;
@@ -26,7 +27,6 @@ void readString(char *string, char separator) {
 
 
 int main(int argc, char *argv[]) {
-    
     char function[20];
 
     while(1) { //Loop infinito

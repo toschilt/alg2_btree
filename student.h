@@ -14,8 +14,8 @@ typedef struct {
     float nota;
 } studentRegister;
 
-
-//função para imprimir aluno
+//int getStudentSize()
+//printStudent(student)
 
 
 #endif

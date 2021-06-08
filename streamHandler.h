@@ -15,4 +15,8 @@ studentRegister *readStudentFromUser();
 
 //Cuidar de strings de entrada (Talvez em arquivo separado?)
 
+// insertInDataFile(student)
+// searchInDataFile(RRN)
+// getPageFromBTreeFile(RRN)
+
 #endif

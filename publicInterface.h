@@ -16,12 +16,14 @@ void update(studentRegister *student);
     recebe RRN
     se RRN for -1, retorna que registro nao existe
     searchInDataFile(rrn)
-    pritntStudent(student)
+    printStudent(student)
 
 
     -- INSERT --
     inserir na btree
-    imprime caso o registro ja exista
+    imprime erro caso o registro ja exista
+    Caso tenha sido inserido com sucesso, insere as informações de student no fim do arquivo de dados
+
 */
 
 #endif

@@ -220,27 +220,84 @@ retorna record
 
 
 -- INSERIR --
-bTreeSearch(chave);
+bTreeInsert(record);
 abrir o arquivo
 getorcreateroot
 caso necessário, createroot
+Chama _bTreeInsert
+Checka se promotedKey é nulo
+    Caso seja, sucesso :)
+    
+    Caso não seja,
+    - Necessidade de atualizar o header
+    headerUpdate(promotedKey)
 
-função recursiva
-bTreePage *_bTreeSearchForInsert(pagina p buscar, chave)
+
+Erro *_bTreeInsert(pagina p buscar, chave, **promotedKey)
+
+- Chama bin search para verificar se o nó existe
+    - Caso ache
+        - retorna ConseguiInserir = 0
+
 - Verifica se é folha
-    - Caso seja, retorna a folha
-    - Caso contrário, verifica se a chave está na pagina
-        - Caso esteja, retorna nulo
-        - Caso contrário, chama recursão na pagina adequada
+    - Se sim,
+        - Função para fazer a inserção
+        *promotedKey = bTreeInsertIntoPage(promotedKey, pagina, posição de inserção)
+        return
+            
+
+    - Se não,
+        - Acha página certa
+        - Chama recursão na pagina certa
+
+        - Checka se promotedKey é nulo
+            - Se for
+                - Retorna ConseguiInserir = 1
+            - Se não for
+                *promotedKey = bTreeInsertIntoPage(promotedKey, pagina, posição de inserção)
 
 
-se for nulo, retorna erro
-caso contrário, bb para ver se o registro existe
-    - Caso exista retorna erro
-    - Caso contrário
+
+binarySearchForInsertion(key, vetor, srart, finish)
+    - Caso encontre o elemento, retorna -1 (erro)
+    - Caso contrário, retorna a posição de isnerção
+
+
+promotedKey *bTreeInsertIntoPage(promotedKey, pagina, posição de inserção)
+- Checka se página está cheia
+    - Caso não
+    Insere na posição
+    Insere os ponteiros
+    retorna NULL
+
+    - Caso sim
+    Cria novo nó
+    Verifico onde vou inserir
+        Se MAXKEYS for PAR
+        Se for antes da metade:
+        Pego a chave do meio -1 e promovo
+        
+        Se for depois da metade
+        Pega a chave do meio e promovo
+
+        Se MAXKEYS for IMPAR
+        Se for antes da metade:
+        Pego a chave do meio e promovo
+        
+        Se for depois da metade
+        Pega a chave do meio + 1 e promovo
+
+    Crio um novo nó com o conteúdo da direita
 
 
 
+headerUpdate(promotedKey)
+- Atualiza o header do arquivo p rrn de promotedKey
+
+
+
+
+-- ATUALIZAR --
 
 
 
