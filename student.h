@@ -14,8 +14,8 @@ typedef struct {
     float nota;
 } studentRegister;
 
-//int getStudentSize()
-//printStudent(student)
 
+int getStudentSize();
+void printStudent(studentRegister *student);
 
 #endif

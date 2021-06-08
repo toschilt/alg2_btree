@@ -8,15 +8,19 @@
 studentRegister *searchInDataFile(long RRN);
 studentRegister *readStudentFromUser();
 
+void insertStudentInDataFile(studentRegister *student);
+void insertNodeInBTreeFile(); //DISCUTIR SOBRE ESSA FUNÇÃO
+
+bTreePage *getPageFromBTreeFile(long RRN);
 
 //Função para salvar registro em arquivo de dados
 
 //Função para coletar registro do arquivo de dados a partir do RRN
 
-//Cuidar de strings de entrada (Talvez em arquivo separado?)
-
 // insertInDataFile(student)
 // searchInDataFile(RRN)
 // getPageFromBTreeFile(RRN)
+
+
 
 #endif
