@@ -3,7 +3,8 @@
 
 
 bTreePage *createRoot(FILE *bFile) {
-
+    FILE *filePointer = fopen(BTREEFILENAME, "w");
+    
 }
 
 
