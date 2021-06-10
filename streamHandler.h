@@ -3,23 +3,22 @@
 
 #include "student.h"
 #include "btree.h"
+#include <string.h>
 
+#define BTREEFILENAME "btree.dat"
+#define DATAFILENAME "data.dat"
 
-studentRegister *searchInDataFile(long RRN);
+void readString(char *string, char separator);
+
+studentRegister *searchStudentInDataFile(long RRN);
 studentRegister *readStudentFromUser();
 
 void insertStudentInDataFile(studentRegister *student);
 void insertNodeInBTreeFile(); //DISCUTIR SOBRE ESSA FUNÇÃO
 
+long getRecordsInDataFile();
 bTreePage *getPageFromBTreeFile(long RRN);
 
-//Função para salvar registro em arquivo de dados
-
-//Função para coletar registro do arquivo de dados a partir do RRN
-
-// insertInDataFile(student)
-// searchInDataFile(RRN)
-// getPageFromBTreeFile(RRN)
 
 
 

@@ -2,9 +2,9 @@
 #define __STUDENT_H__
 
 //Alterar os valores
-#define NOMESIZE 10
-#define SOBRENOMESIZE 10
-#define CURSOSIZE 10
+#define NOMESIZE 20
+#define SOBRENOMESIZE 20
+#define CURSOSIZE 25
 
 typedef struct {
     int nusp;

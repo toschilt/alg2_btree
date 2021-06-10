@@ -1,28 +1,12 @@
 #include "btree.h"
 #include "streamHandler.h"
-#include <string.h>
-
-#define BTREEFILENAME "btree.dat"
+#include "publicInterface.h"
+#include "student.h"
 
 #define EXITFUNCTIONNAME "exit"
 #define SEARCHFUNCTIONNAME "search"
 #define INSERTFUNCTIONNAME "insert"
 #define UPDATEFUNCTIONNAME "update"
-
-
-//ATUALIZAR
-void readString(char *string, char separator) {
-    char buf;
-    int i = 0;
-    do {
-        buf = fgetc(stdin); //Lê a próxima entrada
-        string[i] = buf; //Adiciona à string
-        i++;
-    } while(buf != '\n' && buf != EOF && buf != '\0' && buf != separator);
-    //Enquanto não for lido algum dos acima, a leitura da string continua
-    i--;
-    string[i] = '\0'; //Adiciona o \0 no local devido e retorna
-}
 
 
 
@@ -35,18 +19,19 @@ int main(int argc, char *argv[]) {
         if(!strcmp(function, EXITFUNCTIONNAME)) { //Encerrar o programa (exit)
             //DESALOCA TUDO
             //ENCERRA
-            printf("Encerra\n");
-            return; //Encerra o programa
+            return 0; //Encerra o programa
         }
 
         else if(!strcmp(function, INSERTFUNCTIONNAME)) { //Inserir novo estudante (insert)
-            //CUIDA DA PARTE DE INSERÇÃO
-            printf("insere\n");
+            studentRegister *student = (studentRegister*)malloc(getStudentSize());
+            student = readStudentFromUser();
+            insert(student);
         }
 
         else if(!strcmp(function, SEARCHFUNCTIONNAME)) {
-            //CUIDA DA BUSCA
-            printf("buscar\n");
+            int key;
+            scanf("%d", &key);
+            search(key);
         }
 
         else if(!strcmp(function, UPDATEFUNCTIONNAME)) {

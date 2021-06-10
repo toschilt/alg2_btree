@@ -5,7 +5,7 @@
 #include "btree.h"
 #include "streamHandler.h"
 
-void search(long key);
+void search(int key);
 void insert(studentRegister *student);
 void update(studentRegister *student);
 
