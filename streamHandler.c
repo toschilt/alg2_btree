@@ -56,6 +56,19 @@ void insertStudentInDataFile(studentRegister *student) {
 }
 
 
+void updateStudent(studentRegister *student, long RRN) {
+    FILE *filePointer = fopen(DATAFILENAME, "r+");
+    fseek(filePointer, RRN * getStudentSize(), SEEK_SET);
+    fwrite(&student->nusp, sizeof(int), 1, filePointer);
+    fwrite(student->nome, NOMESIZE * sizeof(char), 1, filePointer);
+    fwrite(student->sobrenome, SOBRENOMESIZE * sizeof(char), 1, filePointer);
+    fwrite(student->curso, CURSOSIZE * sizeof(char), 1, filePointer);
+    fwrite(&student->nota, sizeof(float), 1, filePointer);
+    fflush(filePointer);
+    fclose(filePointer);
+}
+
+
 long getRecordsInDataFile() {
     FILE *filePointer = fopen(DATAFILENAME, "a");
     fseek(filePointer, 0, SEEK_END);

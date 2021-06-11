@@ -9,6 +9,7 @@
 void search(int key);
 void insert(studentRegister *student);
 void update(studentRegister *student);
+void print();
 
 
 #endif

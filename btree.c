@@ -43,7 +43,6 @@ bTreePage *getOrCreateRoot(FILE *bFile) {
         return bPage;
     } else {
         fread(&headerRRN, sizeof(int), 1, bFile);
-        printf("%d\n", headerRRN);
         bTreePage *bPage = getPageFromBTreeFile(headerRRN);
         return bPage;
     }
@@ -51,31 +50,34 @@ bTreePage *getOrCreateRoot(FILE *bFile) {
 
 
 long pageBinarySearch(int searchKey, record *records, long firstSearch, long lastSearch) {
-    long middle = ceil((firstSearch + lastSearch) / 2.0);
+    long middle = (firstSearch + lastSearch) / 2;
+
+    // printf("first: %ld last: %ld middle %ld\nkey: %d rkey: %d\n\n", firstSearch, lastSearch, middle, searchKey, records[middle].key);
   
     if(records[middle].key == searchKey) { return middle; }
     if(middle == firstSearch && middle == lastSearch) { return -1; }
 
-    if(records[middle].key > searchKey) { 
+    if(records[middle].key < searchKey) { 
         return pageBinarySearch(searchKey, records, middle+1, lastSearch);
     }
 
-    return pageBinarySearch(searchKey, records, firstSearch, middle-1); 
+    return pageBinarySearch(searchKey, records, firstSearch, middle); 
 }
 
-
+//TALVEZ JUNTAR AMBAS AS FUNÇÕES DE BUSCA BINÁRIA EM 1 SÓ, COM O FLAG DE TIPO DE OPERAÇÃO, DADO QUE SÃO EXATAMENTE O MSM CÓDIGO
 long binarySearchForInsertion(int searchKey, record *records, long firstSearch, long lastSearch) {
+    long middle = (firstSearch + lastSearch) / 2;
 
-    long middle = ceil((firstSearch + lastSearch) / 2.0);
+    // printf("first: %ld last: %ld middle %ld\nkey: %d rkey: %d\n\n", firstSearch, lastSearch, middle, searchKey, records[middle].key);
     
     if(records[middle].key == searchKey) { return -1; }
     if(middle == firstSearch && middle == lastSearch) { return middle; }
 
-    if(records[middle].key > searchKey) { 
+    if(records[middle].key < searchKey) { 
         return binarySearchForInsertion(searchKey, records, middle+1, lastSearch);
     }
 
-    return binarySearchForInsertion(searchKey, records, firstSearch, middle-1);  
+    return binarySearchForInsertion(searchKey, records, firstSearch, middle);  
 }
 
 
@@ -174,7 +176,8 @@ promotedKey *bTreeInsertIntoPage(record *newRecord, promotedKey *promoted, bTree
     } 
 
     else {
-        for(int i = (MAXKEYS-2); i > insertPosition; i--) { //Atualizar os filhos!!!
+        //Falta atualizar os filhos!!!
+        for(int i = (MAXKEYS-2); i > insertPosition; i--) { 
             bPage->records[i].key = bPage->records[i-1].key;
             bPage->records[i].RRN = bPage->records[i-1].RRN;
         }
@@ -191,3 +194,10 @@ int headerUpdate(promotedKey *promoted) {
     return 0;
 }
 
+
+void bTreePrint() {
+    FILE *bFile = fopen(BTREEFILENAME, "r+");
+    bTreePage *bPage = getOrCreateRoot(bFile);
+    printNode(bPage);
+    free(bPage);
+}

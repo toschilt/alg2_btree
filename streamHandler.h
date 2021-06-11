@@ -15,6 +15,7 @@ studentRegister *searchStudentInDataFile(long RRN);
 studentRegister *readStudentFromUser();
 
 void insertStudentInDataFile(studentRegister *student);
+void updateStudent(studentRegister *student, long RRN);
 void insertNodeInBTreeFile(bTreePage *bPage, FILE *bFile, long RRN);
 
 long getRecordsInDataFile();

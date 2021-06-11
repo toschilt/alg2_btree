@@ -42,6 +42,8 @@ int _bTreeInsert(record *newRecord, bTreePage *bPage, promotedKey **promoted);
 promotedKey *bTreeInsertIntoPage(record *newRecord, promotedKey *promoted, bTreePage *bPage, long insertPosition);
 int headerUpdate(promotedKey *promoted);
 
+
+void bTreePrint();
 void printNode(bTreePage *bPage);
 //Funções para update
 

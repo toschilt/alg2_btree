@@ -5,7 +5,7 @@ void search(int key) {
     long RRN = bTreeSearch(key);
 
     if(RRN == -1) {
-        printf("O registro não existe\n");
+        printf("Registro nao encontrado!\n");
         return;
     }
 
@@ -31,6 +31,17 @@ void insert(studentRegister *student) {
 
 
 void update(studentRegister *student) {
-    printf("Atualização\n");
+    long RRN = bTreeSearch(student->nusp);
+
+    if(RRN == -1) {
+        printf("Registro nao encontrado!\n");
+        return;
+    }
+
+    updateStudent(student, RRN);
 }
 
+
+void print() {
+    bTreePrint();
+}
