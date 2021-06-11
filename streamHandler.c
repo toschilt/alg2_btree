@@ -56,9 +56,6 @@ void insertStudentInDataFile(studentRegister *student) {
 }
 
 
-void insertNodeInBTreeFile(); //DISCUTIR SOBRE ESSA FUNÇÃO
-
-
 long getRecordsInDataFile() {
     FILE *filePointer = fopen(DATAFILENAME, "a");
     fseek(filePointer, 0, SEEK_END);
@@ -68,11 +65,25 @@ long getRecordsInDataFile() {
 }
 
 
+
+void insertNodeInBTreeFile(bTreePage *bPage, FILE *bFile, long RRN) {
+    
+    if(RRN == -1) { fseek(bFile, 0, SEEK_END); } //Caso RRN seja -1, insere no fim
+    else { fseek(bFile, RRN * PAGESIZE, SEEK_SET); } //Caso contrário, insere em posição específica
+
+    fwrite(bPage, PAGESIZE, 1, bFile);
+    fflush(bFile);
+}
+
+
+
 bTreePage *getPageFromBTreeFile(long RRN) {
-    FILE *filePointer = fopen(BTREEFILENAME, "r");
+    FILE *filePointer = fopen(BTREEFILENAME, "r+");
     bTreePage *bPage = (bTreePage*)malloc(PAGESIZE);
-    fseek(filePointer, RRN * PAGESIZE, SEEK_SET);
-    fread(&bPage, PAGESIZE, 1, filePointer);
+
+    fseek(filePointer, RRN * PAGESIZE, SEEK_SET);    
+    fread(bPage, PAGESIZE, 1, filePointer);
+
     fclose(filePointer);
     return bPage;
 }

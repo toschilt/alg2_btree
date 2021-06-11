@@ -13,6 +13,9 @@
 int main(int argc, char *argv[]) {
     char function[20];
 
+    FILE *fp = fopen(BTREEFILENAME, "w");
+    fclose(fp);
+
     while(1) { //Loop infinito
         readString(function, ' '); //Lê a entrada do usuário, passando o espaço como separador
         

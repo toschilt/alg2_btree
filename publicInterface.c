@@ -2,7 +2,6 @@
 
 
 void search(int key) {
-    printf("Busca\n");
     long RRN = bTreeSearch(key);
 
     if(RRN == -1) {
@@ -10,13 +9,12 @@ void search(int key) {
         return;
     }
 
-    studentRegister *student = searchStudentInDataFile(key);
+    studentRegister *student = searchStudentInDataFile(RRN);
     printStudent(student);
 }
 
 
 void insert(studentRegister *student) {
-    printf("Inserção\n");
     
     record *rec = (record*)malloc(sizeof(record));
     rec->key = student->nusp;
@@ -35,3 +33,4 @@ void insert(studentRegister *student) {
 void update(studentRegister *student) {
     printf("Atualização\n");
 }
+
