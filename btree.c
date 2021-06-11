@@ -1,251 +1,203 @@
 #include "btree.h"
 #include "streamHandler.h"
+#include "math.h"
+
+
+bTreePage *createPage() {
+    bTreePage *bPage = (bTreePage*)malloc(PAGESIZE);
+    bPage->numRecords = 0;
+    bPage->isLeaf = 1;
+    
+    for(int i = 0; i < MAXKEYS; i++) {
+        bPage->childs[i] = -1;
+        if(i != (MAXKEYS-1)) { 
+            bPage->records[i].key = 0;
+            bPage->records[i].RRN = -1;
+        }
+    }
+    return bPage;
+}
 
 
 bTreePage *createRoot(FILE *bFile) {
-    FILE *filePointer = fopen(BTREEFILENAME, "w");
+    bTreePage *bPage = createPage();
+    int headerRRN = 1, created = -1;
     
+    fseek(bFile, 0, SEEK_SET);
+    fwrite(&created, sizeof(int), 1, bFile);
+    fwrite(&headerRRN, PAGESIZE - sizeof(int), 1, bFile);
+    fflush(bFile);
+    
+    insertNodeInBTreeFile(bPage, bFile, headerRRN);
+    return bPage;
 }
 
 
 bTreePage *getOrCreateRoot(FILE *bFile) {
+    int headerRRN, created;
+    fseek(bFile, 0, SEEK_SET);
+    fread(&created, sizeof(int), 1, bFile);
 
+    if(created != -1) { 
+        bTreePage *bPage = createRoot(bFile); 
+        return bPage;
+    } else {
+        fread(&headerRRN, sizeof(int), 1, bFile);
+        bTreePage *bPage = getPageFromBTreeFile(headerRRN);
+        return bPage;
+    }
 }
 
 
+long pageBinarySearch(int searchKey, record *records, long firstSearch, long lastSearch) {
+    long middle = (firstSearch + lastSearch) / 2;
 
-long bTreeSearch(int key) {
+    // printf("first: %ld last: %ld middle %ld\nkey: %d rkey: %d\n\n", firstSearch, lastSearch, middle, searchKey, records[middle].key);
+  
+    if(records[middle].key == searchKey) { return middle; }
+    if(middle == firstSearch && middle == lastSearch) { return -1; }
 
+    if(records[middle].key < searchKey) { 
+        return pageBinarySearch(searchKey, records, middle+1, lastSearch);
+    }
+
+    return pageBinarySearch(searchKey, records, firstSearch, middle); 
+}
+
+//TALVEZ JUNTAR AMBAS AS FUNÇÕES DE BUSCA BINÁRIA EM 1 SÓ, COM O FLAG DE TIPO DE OPERAÇÃO, DADO QUE SÃO EXATAMENTE O MSM CÓDIGO
+long binarySearchForInsertion(int searchKey, record *records, long firstSearch, long lastSearch) {
+    long middle = (firstSearch + lastSearch) / 2;
+
+    // printf("first: %ld last: %ld middle %ld\nkey: %d rkey: %d\n\n", firstSearch, lastSearch, middle, searchKey, records[middle].key);
+    
+    if(records[middle].key == searchKey) { return -1; }
+    if(middle == firstSearch && middle == lastSearch) { return middle; }
+
+    if(records[middle].key < searchKey) { 
+        return binarySearchForInsertion(searchKey, records, middle+1, lastSearch);
+    }
+
+    return binarySearchForInsertion(searchKey, records, firstSearch, middle);  
 }
 
 
-bTreePage *_bTreeSearch(bTreePage *bPage, int searchKey) {
+long bTreeSearch(int searchKey) {
+    FILE *bFile = fopen(BTREEFILENAME, "r+");
+    bTreePage *bPage = getOrCreateRoot(bFile);
 
+    int elementPosition = _bTreeSearch(bPage, searchKey);
+    if(elementPosition == -1) { return -1; } //Não encontrou a chave
+    return bPage->records[elementPosition].RRN; //Retorna o RRN da chave encontrada
 }
 
 
+int _bTreeSearch(bTreePage *bPage, int searchKey) {
+    long elementPosition = pageBinarySearch(searchKey, bPage->records, 0, bPage->numRecords);
 
-record *pageBinarySearch(int searchKey, record *records, long firstSearch, long lastSearch) {
+    if(bPage->records[elementPosition].key == searchKey) { return elementPosition; }
 
+    if(!bPage->isLeaf) { //Caso não seja folha
+        if(searchKey < bPage->records[elementPosition].key) {
+            //Se chave de busca < registro em insertPoint, chama recursão no filho a esquerda
+            bTreePage *searchPage = getPageFromBTreeFile(bPage->records[elementPosition].RRN);
+            return _bTreeSearch(searchPage, searchKey);
+        } else {
+            //Se chave de busca > registro em insertPoint, chama recursão no filho a direita
+            bTreePage *searchPage = getPageFromBTreeFile(bPage->records[elementPosition+1].RRN);
+            return _bTreeSearch(searchPage, searchKey);
+        }
+    }
+
+    else { return -1; } //Chave não encontrada
+}
+
+
+void printNode(bTreePage *bPage) {
+    for(int i = 0; i < MAXKEYS; i++) {
+        printf("CHILD: %ld ", bPage->childs[i]);
+        
+        if(i != (MAXKEYS-1)) { 
+            printf("KEY: %d ", bPage->records[i].key);
+            printf("RRN: %ld\n", bPage->records[i].RRN);
+        } else { printf("\n"); }
+    }
 }
 
 
 int bTreeInsert(record *newRecord) {
+    FILE *bFile = fopen(BTREEFILENAME, "r+");
+    bTreePage *bPage = getOrCreateRoot(bFile);
+    
+    promotedKey *promoted = (promotedKey*)malloc(sizeof(promotedKey));
+    promoted = NULL;
 
+    int error = _bTreeInsert(newRecord, bPage, &promoted);
+
+    if(error == 1) { return 1; }
+    if(promoted != NULL) { headerUpdate(promoted); }
+
+    insertNodeInBTreeFile(bPage, bFile, 1); //Vai ser necessário mudar no futuro
+
+    fclose(bFile);
+    free(bPage);
+    return 0;
 }
 
 
-int *_bTreeInsert(int key, bTreePage *bPage, promotedKey **promoted) {
+int _bTreeInsert(record *newRecord, bTreePage *bPage, promotedKey **promoted) {
 
+    int insertPoint = binarySearchForInsertion(newRecord->key, bPage->records, 0, bPage->numRecords);
+    if(insertPoint == -1) { return 1; } //Chave foi encontrada
+
+    if(!bPage->isLeaf) { //Caso não seja folha
+        if(newRecord->key < bPage->records[insertPoint].key) {
+            //Se chave de busca < registro em insertPoint, chama recursão no filho a esquerda
+            bTreePage *searchPage = getPageFromBTreeFile(bPage->records[insertPoint].RRN);
+            return _bTreeInsert(newRecord, searchPage, promoted);
+        } else {
+            //Se chave de busca > registro em insertPoint, chama recursão no filho a direita
+            bTreePage *searchPage = getPageFromBTreeFile(bPage->records[insertPoint+1].RRN);
+            return _bTreeInsert(newRecord, searchPage, promoted);
+        }
+    }
+
+    else {
+        *promoted = bTreeInsertIntoPage(newRecord, *promoted, bPage, insertPoint);
+    }
+
+    return 0;
 }
 
 
+promotedKey *bTreeInsertIntoPage(record *newRecord, promotedKey *promoted, bTreePage *bPage, long insertPosition) {
 
-promotedKey *bTreeInsertIntoPage(promotedKey *promoted, bTreePage *bPage, long insertPosition) {
+    if(bPage->numRecords == MAXKEYS) {
+        //OVERFLOW 
+    } 
 
-}
+    else {
+        //Falta atualizar os filhos!!!
+        for(int i = (MAXKEYS-2); i > insertPosition; i--) { 
+            bPage->records[i].key = bPage->records[i-1].key;
+            bPage->records[i].RRN = bPage->records[i-1].RRN;
+        }
+        bPage->records[insertPosition].key = newRecord->key;
+        bPage->records[insertPosition].RRN = newRecord->RRN;
+    }
 
-
-long binarySearchForInsertion(int searchKey, record *records, long firstSearch, long lastSearch) {
-
+    bPage->numRecords++;
+    return promoted;
 }
 
 
 int headerUpdate(promotedKey *promoted) {
-
+    return 0;
 }
 
 
-/* FUNÇÕES
-
--- BUSCA -- 
-bTreeSearch(chave);
-abrir o arquivo
-getorcreateroot
-caso necessário, createroot
-
-função recursiva
-bTreePage *_bTreeSearch(pagina p buscar, chave)
-- Verifica se chave está em pagina p buscar com bb
-    - Caso esteja, retorna pagina p buscar
-    
-    - Caso contrário:
-    - Verifica se é folha
-        - Caso seja, retorna nulo
-        
-        - Caso contrário
-        - chama recursão em pagina adequada
-
-se _bTreePage retorna nulo, nao encontrou
-caso contrário
-    - varre a página e retorna o rrn do arquivo de dados
-
-retorna o RRN
-
-
-getOrCreateRoot(arquivo)
-- Abrir o arquivo
-    - Se o arquivo tiver vazio, chama createRoot
-    - Pega o RRN do cabeçalho
-    - abre e retorna a página raiz
-
-
-createRoot(arquivo)
-- Cria o header
-- Aloca uma página e insere no arquivo da btree
-- retorna o ponteiro da pagina alocada
-
-
-buscabinaria(key, vetor de registros, começo, fim)
-verifica se pagina > local de busca / 2
-    caso seja, chama bb em local de busca da direita
-    return buscabinaria(key, vetor, final / 2, final)
-    caso nao seja, chama bb em local de busca da esquerda
-retorna record
-
-
-
--- INSERIR --
-bTreeInsert(record);
-abrir o arquivo
-getorcreateroot
-caso necessário, createroot
-Chama _bTreeInsert
-Checka se promotedKey é nulo
-    Caso seja, sucesso :)
-    
-    Caso não seja,
-    - Necessidade de atualizar o header
-    headerUpdate(promotedKey)
-
-
-Erro *_bTreeInsert(pagina p buscar, chave, **promotedKey)
-
-- Chama bin search para verificar se o nó existe
-    - Caso ache
-        - retorna ConseguiInserir = 0
-
-- Verifica se é folha
-    - Se sim,
-        - Função para fazer a inserção
-        *promotedKey = bTreeInsertIntoPage(promotedKey, pagina, posição de inserção)
-        return
-            
-
-    - Se não,
-        - Acha página certa
-        - Chama recursão na pagina certa
-
-        - Checka se promotedKey é nulo
-            - Se for
-                - Retorna ConseguiInserir = 1
-            - Se não for
-                *promotedKey = bTreeInsertIntoPage(promotedKey, pagina, posição de inserção)
-
-
-
-binarySearchForInsertion(key, vetor, srart, finish)
-    - Caso encontre o elemento, retorna -1 (erro)
-    - Caso contrário, retorna a posição de isnerção
-
-
-promotedKey *bTreeInsertIntoPage(promotedKey, pagina, posição de inserção)
-- Checka se página está cheia
-    - Caso não
-    Insere na posição
-    Insere os ponteiros
-    retorna NULL
-
-    - Caso sim
-    Cria novo nó
-    Verifico onde vou inserir
-        Se MAXKEYS for PAR
-        Se for antes da metade:
-        Pego a chave do meio -1 e promovo
-        
-        Se for depois da metade
-        Pega a chave do meio e promovo
-
-        Se MAXKEYS for IMPAR
-        Se for antes da metade:
-        Pego a chave do meio e promovo
-        
-        Se for depois da metade
-        Pega a chave do meio + 1 e promovo
-
-    Crio um novo nó com o conteúdo da direita
-
-
-
-headerUpdate(promotedKey)
-- Atualiza o header do arquivo p rrn de promotedKey
-
-
-
-
--- ATUALIZAR --
-
-
-
-*/
-
-
-
-//-----------------------------------------------------------------------------//
-
-
-
-// Função antiga para inserção:
-// Errors bTreeInsert(record *record, bTreePage *root, FILE *bTreeFile)
-
-/* Carrega a raíz do arquivo da bTree
-    
-SITUAÇÕES DE INSERÇÃO
-
-ÁRVORE VAZIA
-- Criação e preenchimento do nó raíz
-- Primeira chave: Criação do nó raíz
-- Demais chaves: Inserção até a capacidade limite do nó
-* Chaves ordenadas
-
-- Nó raíz = nó folha
-- Ponteiros: -1
-
-
-OVERFLOW NO NÓ RAÍZ
-- Particionamento do nó (split)
-- Split 1-to-2
-- As chaves são distribuídas uniformemente nos dois nós
-- As duas páginas novas possuem metade da capacidade preenchida
-
-- Criação de uma nova raíz
-- A nova raíz é constituída de um elemento
-
-- A primeira chave do novo nó após particionamento é promovida para o nó raíz
-- O pontiero da esqueda do novo nó raíz aponta para a página inicial
-- O ponteiro da direita do novo nó raíz aponta para a página recêm-criada
-
-
-INSERÇÃO EM NÓS FOLHA
-- Pesquisa
-- A árvore é percorrida até encontrar o nó filha no qual a nova chave será inserida
-- Páginas são lidas para a memória principal
-
-    INSERÇÃO SEM OVERFLOW
-    - Ordenação das chaves após a inserção
-
-    INSERÇÃO COM OVERFLOW
-    - Particionamento do nó (split)
-    - Criação de um novo nó
-    - Nó original = nó original + novo nó
-    - Distribuição unifomre das chaves nos dois nós
-
-    - Promoção
-    - A escolha da primeira chave do novo nó como chave separadora no nó pai
-    - Reordenação e ajuste do nó pai para apontar para o novo nó
-    - Propagação de overflow
-*/
-
-
-
-
+void bTreePrint() {
+    FILE *bFile = fopen(BTREEFILENAME, "r+");
+    bTreePage *bPage = getOrCreateRoot(bFile);
+    printNode(bPage);
+    free(bPage);
+}

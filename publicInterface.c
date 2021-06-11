@@ -2,21 +2,19 @@
 
 
 void search(int key) {
-    printf("Busca\n");
     long RRN = bTreeSearch(key);
 
     if(RRN == -1) {
-        printf("O registro não existe\n");
+        printf("Registro nao encontrado!\n");
         return;
     }
 
-    studentRegister *student = searchStudentInDataFile(key);
+    studentRegister *student = searchStudentInDataFile(RRN);
     printStudent(student);
 }
 
 
 void insert(studentRegister *student) {
-    printf("Inserção\n");
     
     record *rec = (record*)malloc(sizeof(record));
     rec->key = student->nusp;
@@ -33,5 +31,17 @@ void insert(studentRegister *student) {
 
 
 void update(studentRegister *student) {
-    printf("Atualização\n");
+    long RRN = bTreeSearch(student->nusp);
+
+    if(RRN == -1) {
+        printf("Registro nao encontrado!\n");
+        return;
+    }
+
+    updateStudent(student, RRN);
+}
+
+
+void print() {
+    bTreePrint();
 }

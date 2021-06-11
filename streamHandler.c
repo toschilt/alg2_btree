@@ -56,7 +56,17 @@ void insertStudentInDataFile(studentRegister *student) {
 }
 
 
-void insertNodeInBTreeFile(); //DISCUTIR SOBRE ESSA FUNÇÃO
+void updateStudent(studentRegister *student, long RRN) {
+    FILE *filePointer = fopen(DATAFILENAME, "r+");
+    fseek(filePointer, RRN * getStudentSize(), SEEK_SET);
+    fwrite(&student->nusp, sizeof(int), 1, filePointer);
+    fwrite(student->nome, NOMESIZE * sizeof(char), 1, filePointer);
+    fwrite(student->sobrenome, SOBRENOMESIZE * sizeof(char), 1, filePointer);
+    fwrite(student->curso, CURSOSIZE * sizeof(char), 1, filePointer);
+    fwrite(&student->nota, sizeof(float), 1, filePointer);
+    fflush(filePointer);
+    fclose(filePointer);
+}
 
 
 long getRecordsInDataFile() {
@@ -68,11 +78,25 @@ long getRecordsInDataFile() {
 }
 
 
+
+void insertNodeInBTreeFile(bTreePage *bPage, FILE *bFile, long RRN) {
+    
+    if(RRN == -1) { fseek(bFile, 0, SEEK_END); } //Caso RRN seja -1, insere no fim
+    else { fseek(bFile, RRN * PAGESIZE, SEEK_SET); } //Caso contrário, insere em posição específica
+
+    fwrite(bPage, PAGESIZE, 1, bFile);
+    fflush(bFile);
+}
+
+
+
 bTreePage *getPageFromBTreeFile(long RRN) {
-    FILE *filePointer = fopen(BTREEFILENAME, "r");
+    FILE *filePointer = fopen(BTREEFILENAME, "r+");
     bTreePage *bPage = (bTreePage*)malloc(PAGESIZE);
-    fseek(filePointer, RRN * PAGESIZE, SEEK_SET);
-    fread(&bPage, PAGESIZE, 1, filePointer);
+
+    fseek(filePointer, RRN * PAGESIZE, SEEK_SET);    
+    fread(bPage, PAGESIZE, 1, filePointer);
+
     fclose(filePointer);
     return bPage;
 }

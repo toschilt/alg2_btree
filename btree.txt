@@ -1,3 +1,169 @@
+--- TXT COM O PSEUDOCÓDIGO ---
+/*getOrCreateRoot(arquivo)
+- Abrir o arquivo
+- Se o arquivo tiver vazio, chama createRoot
+- Pega o RRN do cabeçalho
+- abre e retorna a página raiz*/
+
+//Chave deve estar na esquerda
+
+/*buscabinaria(key, vetor de registros, começo, fim)
+verifica se pagina > local de busca / 2
+caso seja, chama bb em local de busca da direita
+return buscabinaria(key, vetor, final / 2, final)
+caso nao seja, chama bb em local de busca da esquerda
+retorna record*/
+
+// FILE *bFile = fopen(BTREEFILENAME, "a+");
+// bTreePage *bPage = getOrCreateRoot(bFile);
+// long RRN = _bTreeSearch(bPage, searchKey);
+
+
+/*-- BUSCA -- 
+
+função recursiva
+bTreePage *_bTreeSearch(pagina p buscar, chave)
+- Verifica se chave está em pagina p buscar com bb
+    - Caso esteja, retorna pagina p buscar
+    
+    - Caso contrário:
+    - Verifica se é folha
+        - Caso seja, retorna nulo
+        
+        - Caso contrário
+        - chama recursão em pagina adequada
+
+se _bTreePage retorna nulo, nao encontrou
+caso contrário
+    - varre a página e retorna o rrn do arquivo de dados
+
+retorna o RRN
+*/
+
+
+/*-- INSERIR --
+bTreeInsert(record);
+abrir o arquivo
+getorcreateroot
+Chama _bTreeInsert
+Checka se promotedKey é nulo
+    Caso seja, sucesso :)
+    
+    Caso não seja,
+    - Necessidade de atualizar o header
+    headerUpdate(promotedKey)
+
+
+
+headerUpdate(promotedKey)
+- Atualiza o header do arquivo p rrn de promotedKey*/
+
+/*long _bTreeInsert(pagina p buscar, chave, **promotedKey)
+
+- Chama bin search para verificar se o nó existe
+    - Caso ache
+        - retorna ConseguiInserir = 0
+
+- Verifica se é folha
+    - Se sim,
+        - Função para fazer a inserção
+        *promotedKey = bTreeInsertIntoPage(promotedKey, pagina, posição de inserção)
+        return
+            
+
+    - Se não,
+        - Acha página certa
+        - Chama recursão na pagina certa
+
+        - Checka se promotedKey é nulo
+            - Se for
+                - Retorna ConseguiInserir = 1
+            - Se não for
+                *promotedKey = bTreeInsertIntoPage(promotedKey, pagina, posição de inserção)
+*/
+
+/*promotedKey *bTreeInsertIntoPage(promotedKey, pagina, posição de inserção)
+- Checka se página está cheia
+    - Caso não
+    Insere na posição
+    Insere os ponteiros
+    retorna NULL
+
+    - Caso sim
+    Cria novo nó
+    Verifico onde vou inserir
+        Se MAXKEYS for PAR
+        Se for antes da metade:
+        Pego a chave do meio -1 e promovo
+        
+        Se for depois da metade
+        Pega a chave do meio e promovo
+
+        Se MAXKEYS for IMPAR
+        Se for antes da metade:
+        Pego a chave do meio e promovo
+        
+        Se for depois da metade
+        Pega a chave do meio + 1 e promovo
+
+    Crio um novo nó com o conteúdo da direita
+*/
+
+
+/*  
+SITUAÇÕES DE INSERÇÃO
+
+ÁRVORE VAZIA
+- Criação e preenchimento do nó raíz
+- Primeira chave: Criação do nó raíz
+- Demais chaves: Inserção até a capacidade limite do nó
+* Chaves ordenadas
+
+- Nó raíz = nó folha
+- Ponteiros: -1
+
+
+OVERFLOW NO NÓ RAÍZ
+- Particionamento do nó (split)
+- Split 1-to-2
+- As chaves são distribuídas uniformemente nos dois nós
+- As duas páginas novas possuem metade da capacidade preenchida
+
+- Criação de uma nova raíz
+- A nova raíz é constituída de um elemento
+
+- A primeira chave do novo nó após particionamento é promovida para o nó raíz
+- O pontiero da esqueda do novo nó raíz aponta para a página inicial
+- O ponteiro da direita do novo nó raíz aponta para a página recêm-criada
+
+
+INSERÇÃO EM NÓS FOLHA
+- Pesquisa
+- A árvore é percorrida até encontrar o nó filha no qual a nova chave será inserida
+- Páginas são lidas para a memória principal
+
+    INSERÇÃO SEM OVERFLOW
+    - Ordenação das chaves após a inserção
+
+    INSERÇÃO COM OVERFLOW
+    - Particionamento do nó (split)
+    - Criação de um novo nó
+    - Nó original = nó original + novo nó
+    - Distribuição unifomre das chaves nos dois nós
+
+    - Promoção
+    - A escolha da primeira chave do novo nó como chave separadora no nó pai
+    - Reordenação e ajuste do nó pai para apontar para o novo nó
+    - Propagação de overflow
+*/
+
+
+
+
+
+
+
+
 --- TXT COM AS INFORMAÇÕES APRESENTADAS PELO PROFESSOR EM AULA ---
 
 /* Cria uma nova árvore
@@ -115,3 +281,19 @@ Errors bTreeInsert(PrimaryIndex *newRecord, bTreePage *root, FILE *bTreeFilePoin
  * Se não encontrar (chegar num nó folha e não estiver lá), retorna -1
 */
 long bTreeSearch(bTreePage *node, int key, FILE* bTreeFilePointer);
+
+
+//Funções antigas:
+/* Coleta o nó raiz
+ * Chama a função de busca
+ * Caso seja encontrado, re-escreve as informações no nó e salva o arquivo
+ * Caso não seja encontrado retorna erro
+*/ 
+//Errors bTreeUpdate(record *record, bTreePage *root, FILE *bTreeFile);
+
+/* Coleta o nó raíz
+ * Busca pela chave na página
+ * Caso não encontre, busca na subárvore apropriada
+ * Recursão até encontrar a chave 
+*/
+//long bTreeSearch(bTreePage *root, int key, FILE *bTreeFile);

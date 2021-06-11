@@ -5,25 +5,11 @@
 #include "btree.h"
 #include "streamHandler.h"
 
+
 void search(int key);
 void insert(studentRegister *student);
 void update(studentRegister *student);
+void print();
 
-
-/*FUNÇÕES
-    -- SEARCH --
-    Chama bTreeSearch(chave)
-    recebe RRN
-    se RRN for -1, retorna que registro nao existe
-    searchInDataFile(rrn)
-    printStudent(student)
-
-
-    -- INSERT --
-    inserir na btree
-    imprime erro caso o registro ja exista
-    Caso tenha sido inserido com sucesso, insere as informações de student no fim do arquivo de dados
-
-*/
 
 #endif

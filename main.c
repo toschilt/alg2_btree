@@ -13,6 +13,12 @@
 int main(int argc, char *argv[]) {
     char function[20];
 
+    FILE *fp = fopen(BTREEFILENAME, "w");
+    fclose(fp);
+
+    FILE *dataf = fopen(DATAFILENAME, "w");
+    fclose(dataf);
+
     while(1) { //Loop infinito
         readString(function, ' '); //Lê a entrada do usuário, passando o espaço como separador
         
@@ -35,8 +41,13 @@ int main(int argc, char *argv[]) {
         }
 
         else if(!strcmp(function, UPDATEFUNCTIONNAME)) {
-            //CUIDA DA ATUALIZAÇÃO
-            printf("Atualizar\n");
+            studentRegister *student = (studentRegister*)malloc(getStudentSize());
+            student = readStudentFromUser();
+            update(student);
+        }
+
+        else if(!strcmp(function, "print")) {
+            print();
         }
     }
 }
