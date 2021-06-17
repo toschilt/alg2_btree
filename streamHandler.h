@@ -16,10 +16,10 @@ studentRegister *readStudentFromUser();
 
 void insertStudentInDataFile(studentRegister *student);
 void updateStudent(studentRegister *student, long RRN);
-void insertNodeInBTreeFile(bTreePage *bPage, FILE *bFile, long RRN);
+void insertNodeInBTreeFile(newPageInfo *newPage, FILE *bFile, long RRN);
 
 long getRecordsInDataFile();
-bTreePage *getPageFromBTreeFile(long RRN);
+newPageInfo *getPageFromBTreeFile(long RRN);
 
 
 #endif
