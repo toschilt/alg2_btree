@@ -22,24 +22,29 @@ typedef struct {
 } bTreePage;
 
 typedef struct {
-    int key;
-    long RRN;
+    record *rec;
     long childs[2];
 } promotedKey;
 
+typedef struct {
+    bTreePage *bPage;
+    int RRN;
+} newPageInfo;
 
-bTreePage *createRoot(FILE *bFile);
-bTreePage *getOrCreateRoot(FILE *bFile);
+
+
+newPageInfo *createRoot(FILE *bFile);
+newPageInfo *getOrCreateRoot(FILE *bFile);
 
 long bTreeSearch(int key);
-int _bTreeSearch(bTreePage *bPage, int searchKey);
+int _bTreeSearch(newPageInfo *newPage, int searchKey);
 long pageBinarySearch(int searchKey, record *records, long firstSearch, long lastSearch);
 long binarySearchForInsertion(int searchKey, record *records, long firstSearch, long lastSearch);
 
 int bTreeInsert(record *newRecord);
-int _bTreeInsert(record *newRecord, bTreePage *bPage, promotedKey **promoted);
+int _bTreeInsert(record *newRecord, newPageInfo *newPage, promotedKey **promoted);
 
-promotedKey *bTreeInsertIntoPage(record *newRecord, promotedKey *promoted, bTreePage *bPage, long insertPosition);
+promotedKey *bTreeInsertIntoPage(record *newRecord, promotedKey *promoted, newPageInfo *newPage, long insertPosition);
 int headerUpdate(promotedKey *promoted);
 
 

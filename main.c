@@ -13,6 +13,7 @@
 int main(int argc, char *argv[]) {
     char function[20];
 
+    //Criação dos documentos binários, pode ser melhorado
     FILE *fp = fopen(BTREEFILENAME, "w");
     fclose(fp);
 
@@ -23,8 +24,6 @@ int main(int argc, char *argv[]) {
         readString(function, ' '); //Lê a entrada do usuário, passando o espaço como separador
         
         if(!strcmp(function, EXITFUNCTIONNAME)) { //Encerrar o programa (exit)
-            //DESALOCA TUDO
-            //ENCERRA
             return 0; //Encerra o programa
         }
 

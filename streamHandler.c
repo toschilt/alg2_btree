@@ -79,24 +79,23 @@ long getRecordsInDataFile() {
 
 
 
-void insertNodeInBTreeFile(bTreePage *bPage, FILE *bFile, long RRN) {
-    
+void insertNodeInBTreeFile(newPageInfo *newPage, FILE *bFile, long RRN) {
     if(RRN == -1) { fseek(bFile, 0, SEEK_END); } //Caso RRN seja -1, insere no fim
     else { fseek(bFile, RRN * PAGESIZE, SEEK_SET); } //Caso contrário, insere em posição específica
 
-    fwrite(bPage, PAGESIZE, 1, bFile);
+    fwrite(newPage, PAGESIZE, 1, bFile);
     fflush(bFile);
 }
 
 
 
-bTreePage *getPageFromBTreeFile(long RRN) {
+newPageInfo *getPageFromBTreeFile(long RRN) {
     FILE *filePointer = fopen(BTREEFILENAME, "r+");
-    bTreePage *bPage = (bTreePage*)malloc(PAGESIZE);
+    newPageInfo *newPage = (newPageInfo*)malloc(PAGESIZE);
 
     fseek(filePointer, RRN * PAGESIZE, SEEK_SET);    
-    fread(bPage, PAGESIZE, 1, filePointer);
+    fread(newPage, PAGESIZE, 1, filePointer);
 
     fclose(filePointer);
-    return bPage;
+    return newPage;
 }
