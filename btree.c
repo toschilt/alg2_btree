@@ -126,6 +126,11 @@ void printNode(bTreePage *bPage) {
     }
 }
 
+void printPromoted(promotedKey *p) {
+    printf("Key: %d RRN: %ld\n", p->rec->key, p->rec->RRN);
+    printf("c1: %ld c2 %ld\n\n", p->childs[0], p->childs[1]);
+}
+
 
 int bTreeInsert(record *newRecord) {
     FILE *bFile = fopen(BTREEFILENAME, "r+");
@@ -163,7 +168,7 @@ int _bTreeInsert(record *newRecord, newPageInfo *newPage, promotedKey **promoted
         }
 
         if(*promoted == NULL) { return 0; } //Consegui inserir
-        
+        else { printf("Preciso inserir promotedkey\n"); }
         //Preciso inserir promotedkey
     }
 
@@ -176,8 +181,9 @@ int _bTreeInsert(record *newRecord, newPageInfo *newPage, promotedKey **promoted
 
 
 void insertPageData(bTreePage *bPage, bTreePage *createdPage, long startingPosition) {
-    createdPage->numRecords = bPage->numRecords - startingPosition + 1;
-    for(long i = 0; i < createdPage->numRecords - 1; i++) {
+    createdPage->numRecords = bPage->numRecords - startingPosition;
+
+    for(long i = 0; i < createdPage->numRecords; i++) {
         createdPage->childs[i] = bPage->childs[i + startingPosition];
         createdPage->records[i].key = bPage->records[i + startingPosition].key;
         createdPage->records[i].RRN = bPage->records[i + startingPosition].RRN;
@@ -187,8 +193,8 @@ void insertPageData(bTreePage *bPage, bTreePage *createdPage, long startingPosit
 
 void cleanPageData(bTreePage *bPage, long startingPosition) {
     
-    if(MAXKEYS % 2 == 0) { bPage->numRecords = startingPosition + 1; }
-    else { bPage->numRecords = startingPosition; }
+    if(MAXKEYS % 2 == 0) { bPage->numRecords = startingPosition; }
+    else { bPage->numRecords = startingPosition + 1; }
 
     for(long i = startingPosition; i < MAXKEYS; i++) {
         bPage->childs[i] = -1;
@@ -248,13 +254,17 @@ promotedKey *bTreeInsertIntoPage(record *newRecord, promotedKey *promoted, newPa
         if(!promotedIsNewRecord) { rec = newRecord; }
         else { rec = &newPage->bPage->records[promotedIndex]; }
 
-        promoted = promoteKey(rec, newPage->RRN, 2);
+        promoted = promoteKey(rec, 1, 2);
+
+        printPromoted(promoted);
 
         insertPageData(newPage->bPage, createdPage->bPage, promotedIndex + 1);
-        cleanPageData(newPage->bPage, promotedIndex);
+        if(!promotedIsNewRecord) { cleanPageData(newPage->bPage, promotedIndex + 1); }
+        else { cleanPageData(newPage->bPage, promotedIndex); }
+
 
         if(promotedIsNewRecord == 1) {
-            printf("Entrei aqui\n");
+            printf("Inseri no da direita\n");
             insertPosition -= MAXKEYS / 2;
             if(maxKeysIsOdd) { insertPosition--; }
 
@@ -264,28 +274,21 @@ promotedKey *bTreeInsertIntoPage(record *newRecord, promotedKey *promoted, newPa
             }
             createdPage->bPage->records[insertPosition].key = newRecord->key;
             createdPage->bPage->records[insertPosition].RRN = newRecord->RRN;
-            createdPage->bPage->numRecords++;
             //inserir new record no da direita
         }
 
         else if(promotedIsNewRecord == -1) {
-            //inserir new record no da esquerda
+            printf("Inseri no da esquerda\n");
+            for(int i = (MAXKEYS-2); i > insertPosition; i--) { 
+                newPage->bPage->records[i].key = newPage->bPage->records[i-1].key;
+                newPage->bPage->records[i].RRN = newPage->bPage->records[i-1].RRN;
+            }
+            newPage->bPage->records[insertPosition].key = newRecord->key;
+            newPage->bPage->records[insertPosition].RRN = newRecord->RRN;
         }
-
-        else if(promotedIsNewRecord == 0) {
-            //inserir promotedIndex no da direita
-        }
-
 
         printNode(newPage->bPage);
         printNode(createdPage->bPage);
-
-
-
-
-
-
-
 
     }
 
