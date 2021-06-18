@@ -44,11 +44,9 @@ long binarySearchForInsertion(int searchKey, record *records, long firstSearch, 
 int bTreeInsert(record *newRecord);
 int _bTreeInsert(record *newRecord, newPageInfo *newPage, promotedKey **promoted);
 
-promotedKey *bTreeInsertIntoPage(record *newRecord, promotedKey *promoted, newPageInfo *newPage, long insertPosition);
+void bTreeInsertIntoPage(record *newRecord, promotedKey **promoted, newPageInfo *newPage, long insertPosition);
 int headerUpdate(promotedKey *promoted, FILE *bFile);
 
-
-void bTreePrint();
 void printNode(bTreePage *bPage);
 
 

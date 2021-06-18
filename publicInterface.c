@@ -42,6 +42,23 @@ void update(studentRegister *student) {
 }
 
 
+
+void printTree(newPageInfo *newPage) {
+    printf("\n");
+    printNode(newPage->bPage);
+
+    if(!newPage->bPage->isLeaf) {
+        printf("\n\n");
+        for(int i = 0; i <= newPage->bPage->numRecords; i++) {
+            newPageInfo *nP = getPageFromBTreeFile(newPage->bPage->childs[i]);
+            printNode(nP->bPage);
+        }
+    }
+}
+
+
 void print() {
-    bTreePrint();
+    FILE *fp = fopen(BTREEFILENAME, "r+");
+    newPageInfo *newPage = getOrCreateRoot(fp);
+    printTree(newPage);
 }
