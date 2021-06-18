@@ -141,7 +141,7 @@ int bTreeInsert(record *newRecord) {
     int error = _bTreeInsert(newRecord, newPage, &promoted);
 
     if(error == 1) { return 1; }
-    if(promoted != NULL) { headerUpdate(promoted); }
+    if(promoted != NULL) { headerUpdate(promoted, bFile); }
 
     insertNodeInBTreeFile(newPage, bFile, newPage->RRN); //Vai ser necessário mudar no futuro
 
@@ -158,17 +158,19 @@ int _bTreeInsert(record *newRecord, newPageInfo *newPage, promotedKey **promoted
 
     if(!newPage->bPage->isLeaf) { //Caso não seja folha
         if(newRecord->key < newPage->bPage->records[insertPoint].key) {
+            printf("Insert: %d Child: %ld\n", insertPoint, newPage->bPage->records[insertPoint-1].RRN);
             //Se chave de busca < registro em insertPoint, chama recursão no filho a esquerda
-            newPageInfo *searchPage = getPageFromBTreeFile(newPage->bPage->records[insertPoint].RRN);
+            newPageInfo *searchPage = getPageFromBTreeFile(newPage->bPage->records[insertPoint-1].RRN);
             return _bTreeInsert(newRecord, searchPage, promoted);
         } else {
+            printf("Insert: %d Child: %ld\n", insertPoint, newPage->bPage->records[insertPoint-1].RRN);
             //Se chave de busca > registro em insertPoint, chama recursão no filho a direita
-            newPageInfo *searchPage = getPageFromBTreeFile(newPage->bPage->records[insertPoint+1].RRN);
+            newPageInfo *searchPage = getPageFromBTreeFile(newPage->bPage->records[insertPoint-1].RRN);
             return _bTreeInsert(newRecord, searchPage, promoted);
         }
 
         if(*promoted == NULL) { return 0; } //Consegui inserir
-        else { printf("Preciso inserir promotedkey\n"); }
+        printf("Preciso inserir promotedkey\n");
         //Preciso inserir promotedkey
     }
 
@@ -220,7 +222,6 @@ promotedKey *bTreeInsertIntoPage(record *newRecord, promotedKey *promoted, newPa
 
         newPageInfo *createdPage = (newPageInfo*)malloc(sizeof(newPageInfo));
         createdPage->bPage = createPage();
-        newPage->bPage->isLeaf = 0;
         int promotedIsNewRecord = 0;
         int maxKeysIsOdd = 0;
         long promotedIndex;
@@ -255,6 +256,7 @@ promotedKey *bTreeInsertIntoPage(record *newRecord, promotedKey *promoted, newPa
         else { rec = &newPage->bPage->records[promotedIndex]; }
 
         promoted = promoteKey(rec, 1, 2);
+        //MUDAR PARA RRN GENÉRICO!!!!!!
 
         printPromoted(promoted);
 
@@ -274,7 +276,6 @@ promotedKey *bTreeInsertIntoPage(record *newRecord, promotedKey *promoted, newPa
             }
             createdPage->bPage->records[insertPosition].key = newRecord->key;
             createdPage->bPage->records[insertPosition].RRN = newRecord->RRN;
-            //inserir new record no da direita
         }
 
         else if(promotedIsNewRecord == -1) {
@@ -307,7 +308,24 @@ promotedKey *bTreeInsertIntoPage(record *newRecord, promotedKey *promoted, newPa
 }
 
 
-int headerUpdate(promotedKey *promoted) {
+int headerUpdate(promotedKey *promoted, FILE* bFile) {
+    newPageInfo *newPage = (newPageInfo*)malloc(sizeof(newPageInfo));
+    newPage->bPage = createPage();
+    fseek(bFile, sizeof(int), SEEK_END);
+    newPage->RRN = ftell(bFile);
+    newPage->bPage->isLeaf = 0;
+
+    bTreeInsertIntoPage(promoted->rec, promoted, newPage, 0);
+    newPage->bPage->childs[0] = promoted->childs[0];
+    newPage->bPage->childs[1] = promoted->childs[1];
+
+    fseek(bFile, sizeof(int), SEEK_SET);
+    fwrite(&newPage->RRN, PAGESIZE - sizeof(int), 1, bFile);
+    fflush(bFile);
+    
+    insertNodeInBTreeFile(newPage, bFile, newPage->RRN);
+    printNode(newPage->bPage);
+
     return 0;
 }
 
