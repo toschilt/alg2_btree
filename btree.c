@@ -3,6 +3,7 @@
 #include "math.h"
 
 
+// *Função utilizada para criar uma nova página da bTree
 bTreePage *createPage() {
     bTreePage *bPage = (bTreePage*)malloc(PAGESIZE);
     bPage->numRecords = 0;
@@ -19,6 +20,7 @@ bTreePage *createPage() {
 }
 
 
+// *Função utilizada para criar a raíz do arquivo da bTree
 newPageInfo *createRoot(FILE *bFile) {
     newPageInfo *newPage = (newPageInfo*)malloc(sizeof(newPageInfo));
     newPage->bPage = createPage();
@@ -35,12 +37,13 @@ newPageInfo *createRoot(FILE *bFile) {
 }
 
 
+// *Função utilizada para coletar a raíz
 newPageInfo *getOrCreateRoot(FILE *bFile) {
     int created, RRN;
     fseek(bFile, 0, SEEK_SET);
     fread(&created, sizeof(int), 1, bFile);
 
-    if(created != -1) { 
+    if(created != -1) {
         newPageInfo *newPage = createRoot(bFile); 
         return newPage;
     } else {
@@ -54,8 +57,6 @@ newPageInfo *getOrCreateRoot(FILE *bFile) {
 long pageBinarySearch(int searchKey, record *records, long firstSearch, long lastSearch) {
     long middle = (firstSearch + lastSearch) / 2;
 
-    // printf("first: %ld last: %ld middle %ld\nkey: %d rkey: %d\n\n", firstSearch, lastSearch, middle, searchKey, records[middle].key);
-  
     if(records[middle].key == searchKey) { return middle; }
     if(middle == firstSearch && middle == lastSearch) { return -1; }
 
@@ -69,9 +70,7 @@ long pageBinarySearch(int searchKey, record *records, long firstSearch, long las
 //TALVEZ JUNTAR AMBAS AS FUNÇÕES DE BUSCA BINÁRIA EM 1 SÓ, COM O FLAG DE TIPO DE OPERAÇÃO, DADO QUE SÃO EXATAMENTE O MSM CÓDIGO
 long binarySearchForInsertion(int searchKey, record *records, long firstSearch, long lastSearch) {
     long middle = (firstSearch + lastSearch) / 2;
-
-    // printf("first: %ld last: %ld middle %ld\nkey: %d rkey: %d\n\n", firstSearch, lastSearch, middle, searchKey, records[middle].key);
-    
+  
     if(records[middle].key == searchKey) { return -1; }
     if(middle == firstSearch && middle == lastSearch) { return middle; }
 
@@ -157,16 +156,15 @@ int _bTreeInsert(record *newRecord, newPageInfo *newPage, promotedKey **promoted
     if(insertPoint == -1) { return 1; } //Chave foi encontrada
 
     if(!newPage->bPage->isLeaf) { //Caso não seja folha
-        if(newRecord->key < newPage->bPage->records[insertPoint].key) {
-            printf("Insert: %d Child: %ld\n", insertPoint, newPage->bPage->records[insertPoint-1].RRN);
-            //Se chave de busca < registro em insertPoint, chama recursão no filho a esquerda
-            newPageInfo *searchPage = getPageFromBTreeFile(newPage->bPage->records[insertPoint-1].RRN);
+        if(newRecord->key > newPage->bPage->records[MAXKEYS-1].key && newPage->bPage->numRecords == MAXKEYS - 1) {
+            newPageInfo *searchPage = getPageFromBTreeFile(newPage->bPage->childs[insertPoint]);
             return _bTreeInsert(newRecord, searchPage, promoted);
+            //Esse nó tá cheio e minha chave é maior que o último, preciso descer em isnertPoint+1
+            //TODO ver se é realmente necessário
         } else {
-            printf("Insert: %d Child: %ld\n", insertPoint, newPage->bPage->records[insertPoint-1].RRN);
-            //Se chave de busca > registro em insertPoint, chama recursão no filho a direita
-            newPageInfo *searchPage = getPageFromBTreeFile(newPage->bPage->records[insertPoint-1].RRN);
+            newPageInfo *searchPage = getPageFromBTreeFile(newPage->bPage->childs[insertPoint]);
             return _bTreeInsert(newRecord, searchPage, promoted);
+            //Chama a recursão na subárvore adequada
         }
 
         if(*promoted == NULL) { return 0; } //Consegui inserir
@@ -182,6 +180,7 @@ int _bTreeInsert(record *newRecord, newPageInfo *newPage, promotedKey **promoted
 }
 
 
+// *Função para inserir dados em nova página em caso de overflow
 void insertPageData(bTreePage *bPage, bTreePage *createdPage, long startingPosition) {
     createdPage->numRecords = bPage->numRecords - startingPosition;
 
@@ -192,7 +191,7 @@ void insertPageData(bTreePage *bPage, bTreePage *createdPage, long startingPosit
     }
 }
 
-
+// *Função para remover dados de uma página com overflow
 void cleanPageData(bTreePage *bPage, long startingPosition) {
     
     if(MAXKEYS % 2 == 0) { bPage->numRecords = startingPosition; }
@@ -207,6 +206,7 @@ void cleanPageData(bTreePage *bPage, long startingPosition) {
     }
 }
 
+// *Função para promover um record
 promotedKey *promoteKey(record *rec, int LeftRRN, int RightRRN) {
     promotedKey *promoted = (promotedKey*)malloc(sizeof(promotedKey));
     promoted->childs[0] = LeftRRN;
@@ -215,11 +215,12 @@ promotedKey *promoteKey(record *rec, int LeftRRN, int RightRRN) {
     return promoted;
 }
 
-
+// *Função para inserir uma nova chave em um nó
 promotedKey *bTreeInsertIntoPage(record *newRecord, promotedKey *promoted, newPageInfo *newPage, long insertPosition) {
 
     if(newPage->bPage->numRecords == MAXKEYS - 1) {
 
+        //Nó está cheio, overflow
         newPageInfo *createdPage = (newPageInfo*)malloc(sizeof(newPageInfo));
         createdPage->bPage = createPage();
         int promotedIsNewRecord = 0;
@@ -254,11 +255,7 @@ promotedKey *bTreeInsertIntoPage(record *newRecord, promotedKey *promoted, newPa
         record *rec;
         if(!promotedIsNewRecord) { rec = newRecord; }
         else { rec = &newPage->bPage->records[promotedIndex]; }
-
         promoted = promoteKey(rec, 1, 2);
-        //MUDAR PARA RRN GENÉRICO!!!!!!
-
-        printPromoted(promoted);
 
         insertPageData(newPage->bPage, createdPage->bPage, promotedIndex + 1);
         if(!promotedIsNewRecord) { cleanPageData(newPage->bPage, promotedIndex + 1); }
@@ -266,7 +263,6 @@ promotedKey *bTreeInsertIntoPage(record *newRecord, promotedKey *promoted, newPa
 
 
         if(promotedIsNewRecord == 1) {
-            printf("Inseri no da direita\n");
             insertPosition -= MAXKEYS / 2;
             if(maxKeysIsOdd) { insertPosition--; }
 
@@ -279,7 +275,6 @@ promotedKey *bTreeInsertIntoPage(record *newRecord, promotedKey *promoted, newPa
         }
 
         else if(promotedIsNewRecord == -1) {
-            printf("Inseri no da esquerda\n");
             for(int i = (MAXKEYS-2); i > insertPosition; i--) { 
                 newPage->bPage->records[i].key = newPage->bPage->records[i-1].key;
                 newPage->bPage->records[i].RRN = newPage->bPage->records[i-1].RRN;
@@ -288,8 +283,8 @@ promotedKey *bTreeInsertIntoPage(record *newRecord, promotedKey *promoted, newPa
             newPage->bPage->records[insertPosition].RRN = newRecord->RRN;
         }
 
-        printNode(newPage->bPage);
-        printNode(createdPage->bPage);
+        FILE *fp = fopen(BTREEFILENAME, "r+");
+        insertNodeInBTreeFile(createdPage, fp, -1);
 
     }
 
@@ -303,6 +298,8 @@ promotedKey *bTreeInsertIntoPage(record *newRecord, promotedKey *promoted, newPa
         newPage->bPage->records[insertPosition].RRN = newRecord->RRN;
         newPage->bPage->numRecords++;
     }
+
+    printNode(newPage->bPage);
 
     return promoted;
 }
@@ -324,15 +321,14 @@ int headerUpdate(promotedKey *promoted, FILE* bFile) {
     fflush(bFile);
     
     insertNodeInBTreeFile(newPage, bFile, newPage->RRN);
-    printNode(newPage->bPage);
 
     return 0;
 }
 
 
-void bTreePrint() {
+void bTreePrint(long RRN) {
     FILE *bFile = fopen(BTREEFILENAME, "r+");
-    newPageInfo *newPage = getOrCreateRoot(bFile);
+    newPageInfo *newPage = getPageFromBTreeFile(RRN);
     printNode(newPage->bPage);
     free(newPage);
 }
