@@ -3,7 +3,6 @@
 #include "math.h"
 
 
-// *Função utilizada para criar uma nova página da bTree
 bTreePage *createPage() {
     bTreePage *bPage = (bTreePage*)malloc(PAGESIZE);
     bPage->numRecords = 0;
@@ -19,8 +18,6 @@ bTreePage *createPage() {
     return bPage;
 }
 
-
-// *Função utilizada para criar a raíz do arquivo da bTree
 newPageInfo *createRoot(FILE *bFile) {
     newPageInfo *newPage = (newPageInfo*)malloc(sizeof(newPageInfo));
     newPage->bPage = createPage();
@@ -29,25 +26,24 @@ newPageInfo *createRoot(FILE *bFile) {
     
     fseek(bFile, 0, SEEK_SET);
     fwrite(&created, sizeof(int), 1, bFile);
-    fwrite(&newPage->RRN, PAGESIZE - sizeof(int), 1, bFile);
+    fwrite(&(newPage->RRN), PAGESIZE - sizeof(int), 1, bFile);
     fflush(bFile);
     
     insertNodeInBTreeFile(newPage, bFile, newPage->RRN);
     return newPage;
 }
 
-
-// *Função utilizada para coletar a raíz
 newPageInfo *getOrCreateRoot(FILE *bFile) {
     int created, RRN;
     fseek(bFile, 0, SEEK_SET);
     fread(&created, sizeof(int), 1, bFile);
 
+    //É impossível que exista um nó sem a raíz antes - confirmar (?????????????????????????????)
     if(created != -1) {
-        newPageInfo *newPage = createRoot(bFile); 
+        newPageInfo *newPage = createRoot(bFile);
         return newPage;
     } else {
-        fread(&RRN, sizeof(int), 1, bFile);
+        fread(&RRN, sizeof(int), 1, bFile); //RRN não é um long? - confirmar (????????????????????????????????)
         newPageInfo *newPage = getPageFromBTreeFile(RRN);
         return newPage;
     }
@@ -57,28 +53,31 @@ newPageInfo *getOrCreateRoot(FILE *bFile) {
 long pageBinarySearch(int searchKey, record *records, long firstSearch, long lastSearch) {
     long middle = (firstSearch + lastSearch) / 2;
 
-    if(records[middle].key == searchKey) { return middle; }
-    if(middle == firstSearch && middle == lastSearch) { return -1; }
+    if(records[middle].key == searchKey)
+        return middle;
 
-    if(records[middle].key < searchKey) { 
+    if(middle == firstSearch && middle == lastSearch)
+        return -1;
+
+    if(records[middle].key < searchKey)
         return pageBinarySearch(searchKey, records, middle+1, lastSearch);
-    }
-
-    return pageBinarySearch(searchKey, records, firstSearch, middle); 
+    else
+        return pageBinarySearch(searchKey, records, firstSearch, middle); 
 }
 
 //TALVEZ JUNTAR AMBAS AS FUNÇÕES DE BUSCA BINÁRIA EM 1 SÓ, COM O FLAG DE TIPO DE OPERAÇÃO, DADO QUE SÃO EXATAMENTE O MSM CÓDIGO
 long binarySearchForInsertion(int searchKey, record *records, long firstSearch, long lastSearch) {
     long middle = (firstSearch + lastSearch) / 2;
   
-    if(records[middle].key == searchKey) { return -1; }
-    if(middle == firstSearch && middle == lastSearch) { return middle; }
+    if(records[middle].key == searchKey)
+        return -1;
+    if(middle == firstSearch && middle == lastSearch)
+        return middle;
 
-    if(records[middle].key < searchKey) { 
+    if(records[middle].key < searchKey)
         return binarySearchForInsertion(searchKey, records, middle+1, lastSearch);
-    }
-
-    return binarySearchForInsertion(searchKey, records, firstSearch, middle);  
+    else
+        return binarySearchForInsertion(searchKey, records, firstSearch, middle);  
 }
 
 
@@ -87,17 +86,30 @@ long bTreeSearch(int searchKey) {
     newPageInfo *newPage = getOrCreateRoot(bFile);
 
     int elementPosition = _bTreeSearch(newPage, searchKey);
-    if(elementPosition == -1) { return -1; } //Não encontrou a chave
-    return newPage->bPage->records[elementPosition].RRN; //Retorna o RRN da chave encontrada
+    
+    if(elementPosition == -1)
+        return -1; //Não encontrou a chave
+    else
+        return newPage->bPage->records[elementPosition].RRN; //Retorna o RRN da chave encontrada
 }
 
 
 int _bTreeSearch(newPageInfo *newPage, int searchKey) {
     long elementPosition = pageBinarySearch(searchKey, newPage->bPage->records, 0, newPage->bPage->numRecords);
 
-    if(newPage->bPage->records[elementPosition].key == searchKey) { return elementPosition; }
+    if(newPage->bPage->records[elementPosition].key == searchKey)
+        return elementPosition;
 
-    if(!newPage->bPage->isLeaf) { //Caso não seja folha
+    //Não encontrou a chave buscada!
+    if(!newPage->bPage->isLeaf) { 
+        //Caso não seja folha,
+
+        /*TOSCHI: Eu acho que newPage->bPage->records[MAXKEYS-1].key dá pau quando o número de registros
+         * é menor do que o máximo número de registros. records[MAXKEYS-1] vai ser nulo s
+        */
+
+        //Parei aqui ------------------------------------------------------------------------------------- TO COM SONO DESCULPA NAO ROLOU MAIS VLWFLW
+
         if(searchKey > newPage->bPage->records[MAXKEYS-1].key && newPage->bPage->numRecords == MAXKEYS - 1) {
             newPageInfo *searchPage = getPageFromBTreeFile(newPage->bPage->childs[elementPosition]);
             return _bTreeSearch(searchPage, searchKey);
