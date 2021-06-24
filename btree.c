@@ -315,7 +315,6 @@ int headerUpdate(promotedKey *promoted, FILE* bFile) {
 }
 
 
-
 //Imprimir nó - Apenas para debugging
 void printNode(bTreePage *bPage) {
     printf("Records: %d\n", bPage->numRecords);
