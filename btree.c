@@ -54,17 +54,17 @@ newPageInfo *getOrCreateRoot(FILE *bFile) {
 }
 
 
-long pageBinarySearch(int searchKey, record *records, long firstSearch, long lastSearch) {
+long binarySearchForSearch(int searchKey, record *records, long firstSearch, long lastSearch) {
     long middle = (firstSearch + lastSearch) / 2;
 
     if(records[middle].key == searchKey) { return middle; }
     if(middle == firstSearch && middle == lastSearch) { return -1; }
 
     if(records[middle].key < searchKey) { 
-        return pageBinarySearch(searchKey, records, middle+1, lastSearch);
+        return binarySearchForSearch(searchKey, records, middle+1, lastSearch);
     }
 
-    return pageBinarySearch(searchKey, records, firstSearch, middle); 
+    return binarySearchForSearch(searchKey, records, firstSearch, middle); 
 }
 
 //TALVEZ JUNTAR AMBAS AS FUNÇÕES DE BUSCA BINÁRIA EM 1 SÓ, COM O FLAG DE TIPO DE OPERAÇÃO, DADO QUE SÃO EXATAMENTE O MSM CÓDIGO
@@ -93,7 +93,7 @@ long bTreeSearch(int searchKey) {
 
 
 int _bTreeSearch(newPageInfo *newPage, int searchKey) {
-    long elementPosition = pageBinarySearch(searchKey, newPage->bPage->records, 0, newPage->bPage->numRecords);
+    long elementPosition = binarySearchForSearch(searchKey, newPage->bPage->records, 0, newPage->bPage->numRecords);
 
     if(newPage->bPage->records[elementPosition].key == searchKey) { return elementPosition; }
 
@@ -119,12 +119,11 @@ int bTreeInsert(record *newRecord) {
     newPageInfo *newPage = getOrCreateRoot(bFile);
      
     promotedKey *promoted = NULL;
-    promotedKey **pointer = &promoted;
 
     int error = _bTreeInsert(newRecord, newPage, &promoted);
 
     if(error == 1) { return 1; }
-    if(*pointer != NULL) { headerUpdate(promoted, bFile); }
+    if(promoted != NULL) { headerUpdate(promoted, bFile); }
 
     insertNodeInBTreeFile(newPage, bFile, newPage->RRN);
 
@@ -263,6 +262,7 @@ void bTreeInsertIntoPage(record *newRecord, promotedKey **promoted, newPageInfo 
             insertPosition -= MAXKEYS / 2;
             if(maxKeysIsOdd) { insertPosition--; }
 
+            //Criar função separada para os for
             for(int i = (MAXKEYS-2); i > insertPosition; i--) { 
                 createdPage->bPage->records[i].key = createdPage->bPage->records[i-1].key;
                 createdPage->bPage->records[i].RRN = createdPage->bPage->records[i-1].RRN;
