@@ -54,32 +54,31 @@ newPageInfo *getOrCreateRoot(FILE *bFile) {
 }
 
 
-long binarySearchForSearch(int searchKey, record *records, long firstSearch, long lastSearch) {
+long pageBinarySearch(int searchKey, record *records, long firstSearch, long lastSearch) {
     long middle = (firstSearch + lastSearch) / 2;
 
-    if(records[middle].key == searchKey) { return middle; }
-    if(middle == firstSearch && middle == lastSearch) { return -1; }
+    if(records[middle].key == searchKey || (middle == firstSearch && middle == lastSearch)) { return middle; }
 
     if(records[middle].key < searchKey) { 
-        return binarySearchForSearch(searchKey, records, middle+1, lastSearch);
+        return pageBinarySearch(searchKey, records, middle+1, lastSearch);
     }
 
-    return binarySearchForSearch(searchKey, records, firstSearch, middle); 
+    return pageBinarySearch(searchKey, records, firstSearch, middle); 
 }
 
 //TALVEZ JUNTAR AMBAS AS FUNÇÕES DE BUSCA BINÁRIA EM 1 SÓ, COM O FLAG DE TIPO DE OPERAÇÃO, DADO QUE SÃO EXATAMENTE O MSM CÓDIGO
-long binarySearchForInsertion(int searchKey, record *records, long firstSearch, long lastSearch) {
-    long middle = (firstSearch + lastSearch) / 2;
+// long binarySearchForInsertion(int searchKey, record *records, long firstSearch, long lastSearch) {
+//     long middle = (firstSearch + lastSearch) / 2;
   
-    if(records[middle].key == searchKey) { return -1; }
-    if(middle == firstSearch && middle == lastSearch) { return middle; }
+//     if(records[middle].key == searchKey) { return -1; }
+//     if(middle == firstSearch && middle == lastSearch) { return middle; }
 
-    if(records[middle].key < searchKey) { 
-        return binarySearchForInsertion(searchKey, records, middle+1, lastSearch);
-    }
+//     if(records[middle].key < searchKey) { 
+//         return binarySearchForInsertion(searchKey, records, middle+1, lastSearch);
+//     }
 
-    return binarySearchForInsertion(searchKey, records, firstSearch, middle);  
-}
+//     return binarySearchForInsertion(searchKey, records, firstSearch, middle);  
+// }
 
 
 long bTreeSearch(int searchKey) {
@@ -93,7 +92,7 @@ long bTreeSearch(int searchKey) {
 
 
 int _bTreeSearch(newPageInfo *newPage, int searchKey) {
-    long elementPosition = binarySearchForSearch(searchKey, newPage->bPage->records, 0, newPage->bPage->numRecords);
+    long elementPosition = pageBinarySearch(searchKey, newPage->bPage->records, 0, newPage->bPage->numRecords);
 
     if(newPage->bPage->records[elementPosition].key == searchKey) { return elementPosition; }
 
@@ -135,26 +134,21 @@ int bTreeInsert(record *newRecord) {
 
 int _bTreeInsert(record *newRecord, newPageInfo *newPage, promotedKey **promoted) {
 
-    int insertPoint = binarySearchForInsertion(newRecord->key, newPage->bPage->records, 0, newPage->bPage->numRecords);
-    if(insertPoint == -1) { return 1; } //Chave ja existe, retorna erro
+    int insertPoint = pageBinarySearch(newRecord->key, newPage->bPage->records, 0, newPage->bPage->numRecords);
+    if(newPage->bPage->records[insertPoint].key == newRecord->key) { return 1; } //Chave ja existe, retorna erro
 
     int status;
     if(!newPage->bPage->isLeaf) { //Caso não seja folha
-        if(newRecord->key > newPage->bPage->records[MAXKEYS-1].key && newPage->bPage->numRecords == MAXKEYS - 1) {
-            newPageInfo *searchPage = getPageFromBTreeFile(newPage->bPage->childs[insertPoint]);
-            status = _bTreeInsert(newRecord, searchPage, promoted);
-            //Esse nó tá cheio e a chave é maior que o último, é necessário chamar a recursão em insertPoint+1
-        } else {
-            newPageInfo *searchPage = getPageFromBTreeFile(newPage->bPage->childs[insertPoint]);
-            status = _bTreeInsert(newRecord, searchPage, promoted);
-            //Chama a recursão na subárvore adequada
-        }
+
+        newPageInfo *searchPage = getPageFromBTreeFile(newPage->bPage->childs[insertPoint]);
+        status = _bTreeInsert(newRecord, searchPage, promoted);
+        //Chama a recursão na subárvore adequada
 
         if(*promoted == NULL) { return 0; } //Inserção realizada com sucesso
         
         //Inserção com overflow, necessidade de inserir promoted
         //TODO caso esta página seja a raíz, é necessário overflow
-        int insertPoint = binarySearchForInsertion((*promoted)->rec->key, newPage->bPage->records, 0, newPage->bPage->numRecords);
+        int insertPoint = pageBinarySearch((*promoted)->rec->key, newPage->bPage->records, 0, newPage->bPage->numRecords);
         bTreeInsertIntoPage((*promoted)->rec, promoted, newPage, insertPoint);
         printf("Key %d RRN %ld\nC0 %ld C1 %ld\n", (*promoted)->rec->key, (*promoted)->rec->RRN, (*promoted)->childs[0], (*promoted)->childs[1]);
         *promoted = NULL; //É necessário atualizar para null, se não todo overflow atualiza a raíz
@@ -353,5 +347,3 @@ void printNode(bTreePage *bPage) {
         } else { printf("\n"); }
     }
 }
-
-

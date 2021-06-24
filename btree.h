@@ -32,17 +32,15 @@ typedef struct {
 } newPageInfo;
 
 
-
 newPageInfo *createRoot(FILE *bFile);
 newPageInfo *getOrCreateRoot(FILE *bFile);
 
 long bTreeSearch(int key);
 int _bTreeSearch(newPageInfo *newPage, int searchKey);
-long binarySearchForSearch(int searchKey, record *records, long firstSearch, long lastSearch);
+long pageBinarySearch(int searchKey, record *records, long firstSearch, long lastSearch);
 
 int bTreeInsert(record *newRecord);
 int _bTreeInsert(record *newRecord, newPageInfo *newPage, promotedKey **promoted);
-long binarySearchForInsertion(int searchKey, record *records, long firstSearch, long lastSearch);
 
 void bTreeInsertIntoPage(record *newRecord, promotedKey **promoted, newPageInfo *newPage, long insertPosition);
 int headerUpdate(promotedKey *promoted, FILE *bFile);
