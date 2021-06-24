@@ -10,8 +10,8 @@
  * com manipulação de streams, seja stdin ou arquivos.
 */
 
-#include "student.h"
 #include "btree.h"
+#include "student.h"
 #include <string.h>
 
 #define BTREEFILENAME "btree.dat"

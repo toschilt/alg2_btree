@@ -1,6 +1,4 @@
 #include "btree.h"
-#include "streamHandler.h"
-#include "math.h"
 
 
 bTreePage *createPage() {
