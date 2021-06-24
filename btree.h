@@ -57,7 +57,7 @@ typedef struct {
 */
 typedef struct {
     bTreePage *bPage;
-    int RRN;
+    long RRN;
 } newPageInfo;
 
 

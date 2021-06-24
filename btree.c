@@ -123,9 +123,6 @@ int _bTreeInsert(record *newRecord, newPageInfo *newPage, promotedKey **promoted
 
         if(*promoted == NULL) { return 0; } //Inserção realizada com sucesso
 
-        (*promoted)->childs[0] /= PAGESIZE;
-        (*promoted)->childs[1] /= PAGESIZE;
-        
         //Inserção com overflow, necessidade de inserir promoted
         //TODO caso esta página seja a raíz, é necessário overflow
         int insertPoint = pageBinarySearch((*promoted)->rec->key, newPage->bPage->records, 0, newPage->bPage->numRecords);
@@ -147,9 +144,10 @@ int _bTreeInsert(record *newRecord, newPageInfo *newPage, promotedKey **promoted
 
 // *Função para inserir dados em nova página em caso de overflow
 void insertPageData(bTreePage *bPage, bTreePage *createdPage, long startingPosition) {
+    
     createdPage->numRecords = bPage->numRecords - startingPosition + 1;
 
-    for(long i = 0; i < createdPage->numRecords; i++) {
+    for(long i = 0; i < createdPage->numRecords - 1; i++) {
         createdPage->childs[i] = bPage->childs[i + startingPosition];
         createdPage->records[i].key = bPage->records[i + startingPosition].key;
         createdPage->records[i].RRN = bPage->records[i + startingPosition].RRN;
@@ -159,8 +157,7 @@ void insertPageData(bTreePage *bPage, bTreePage *createdPage, long startingPosit
 // *Função para remover dados de uma página com overflow
 void cleanPageData(bTreePage *bPage, long startingPosition) {
     
-    if(MAXKEYS % 2 == 0) { bPage->numRecords = startingPosition; }
-    else { bPage->numRecords = startingPosition; }
+    bPage->numRecords = startingPosition;
 
     for(long i = startingPosition; i < MAXKEYS; i++) {
         bPage->childs[i] = -1;
@@ -177,6 +174,7 @@ promotedKey *promoteKey(record *rec, int LeftRRN, int RightRRN) {
     promotedKey *promoted = (promotedKey*)malloc(sizeof(promotedKey));
     promoted->childs[0] = LeftRRN;
     promoted->childs[1] = RightRRN;
+    printf("fio %ld %ld\n", promoted->childs[0], promoted->childs[1]);
     promoted->rec = rec;
     return promoted;
 }
@@ -192,6 +190,7 @@ void bTreeInsertIntoPage(record *newRecord, promotedKey **promoted, newPageInfo 
         FILE *fp = fopen(BTREEFILENAME, "r+");
         fseek(fp, 0, SEEK_END);
         createdPage->RRN = ftell(fp) / PAGESIZE;
+        printf("rrn: %ld\n", createdPage->RRN);
         int insertPlace = 0;
         int maxKeysIsOdd = 0;
         long promotedIndex;
@@ -256,7 +255,7 @@ void bTreeInsertIntoPage(record *newRecord, promotedKey **promoted, newPageInfo 
             newPage->bPage->records[insertPosition].RRN = newRecord->RRN;
         }
         
-        insertNodeInBTreeFile(createdPage, fp, -1);
+        insertNodeInBTreeFile(createdPage, fp, createdPage->RRN);
 
     }
 
@@ -296,7 +295,7 @@ int headerUpdate(promotedKey *promoted, FILE* bFile) {
     printf("Atualizei header\n");
     newPageInfo *newPage = (newPageInfo*)malloc(sizeof(newPageInfo));
     newPage->bPage = createPage();
-    fseek(bFile, sizeof(int), SEEK_END);
+    fseek(bFile, sizeof(int), SEEK_SET);
     newPage->RRN = ftell(bFile);
     newPage->bPage->isLeaf = 0;
     //Aloca uma nova página
