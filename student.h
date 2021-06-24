@@ -1,11 +1,24 @@
 #ifndef __STUDENT_H__
 #define __STUDENT_H__
 
-//Alterar os valores
+/*
+ * Algoritmos e Estruturas de Dados II
+ * Autores: Lucas Toschi e Murilo Todão (Grupo 7)
+ * 
+ * STUDENT.H
+ * Neste arquivo estão as funções e estruturas que definem e operam
+ * sobre o que são consideradas informações de um estudante 
+*/
+
+
 #define NOMESIZE 20
 #define SOBRENOMESIZE 20
 #define CURSOSIZE 25
 
+
+/*
+ * Struct responsável por armazenar os dados de cada estudante.
+*/
 typedef struct {
     int nusp;
     char nome[NOMESIZE];
@@ -14,8 +27,14 @@ typedef struct {
     float nota;
 } studentRegister;
 
-
+/*
+ * Retorna o tamanho da struct com as informações de cada estudante.
+*/
 int getStudentSize();
+
+/*
+ * Imprime na tela as informações do estudante de forma formatada.
+*/
 void printStudent(studentRegister *student);
 
 
