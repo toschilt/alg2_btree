@@ -10,9 +10,11 @@
  * sobre o que são consideradas informações de um estudante 
 */
 
+
 #define NOMESIZE 20
 #define SOBRENOMESIZE 20
 #define CURSOSIZE 25
+
 
 /*
  * Struct responsável por armazenar os dados de cada estudante.

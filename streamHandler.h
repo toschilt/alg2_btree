@@ -13,11 +13,11 @@
 
 #include "student.h"
 #include "btree.h"
-#include "student.h"
 #include <string.h>
 
 #define BTREEFILENAME "btree.dat"
 #define DATAFILENAME "data.dat"
+
 
 /*
  * Leitura de string do usuário com alocação dinâmica.
@@ -65,10 +65,5 @@ long getRecordsInDataFile();
 */
 newPageInfo *getPageFromBTreeFile(long RRN);
 
-/*
- * Recupera a página do arquivo da BTree.
- * MELHORAR ????????????????????????????????????????????????
-*/
-newPageInfo *getPageFromBTreeFile(long RRN);
 
 #endif

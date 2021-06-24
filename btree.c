@@ -1,5 +1,9 @@
 #include "btree.h"
+#include "streamHandler.h"
+#include "math.h"
 
+
+// *Função utilizada para criar uma nova página da bTree
 bTreePage *createPage() {
     bTreePage *bPage = (bTreePage*)malloc(PAGESIZE);
     bPage->numRecords = 0;
@@ -15,6 +19,8 @@ bTreePage *createPage() {
     return bPage;
 }
 
+
+// *Função utilizada para criar a raíz do arquivo da bTree
 newPageInfo *createRoot(FILE *bFile) {
     newPageInfo *newPage = (newPageInfo*)malloc(sizeof(newPageInfo));
     newPage->bPage = createPage();
@@ -23,51 +29,47 @@ newPageInfo *createRoot(FILE *bFile) {
     
     fseek(bFile, 0, SEEK_SET);
     fwrite(&created, sizeof(int), 1, bFile);
-    fwrite(&(newPage->RRN), PAGESIZE - sizeof(int), 1, bFile);
+    fwrite(&newPage->RRN, PAGESIZE - sizeof(int), 1, bFile);
     fflush(bFile);
     
     insertNodeInBTreeFile(newPage, bFile, newPage->RRN);
     return newPage;
 }
 
+
+// *Função utilizada para coletar a raíz
 newPageInfo *getOrCreateRoot(FILE *bFile) {
-    int created;
-    long RRN;
-    
+    int created, RRN;
     fseek(bFile, 0, SEEK_SET);
     fread(&created, sizeof(int), 1, bFile);
 
     if(created != -1) {
-        newPageInfo *newPage = createRoot(bFile);
+        newPageInfo *newPage = createRoot(bFile); 
         return newPage;
     } else {
-        fread(&RRN, sizeof(long), 1, bFile);
+        fread(&RRN, sizeof(int), 1, bFile);
         newPageInfo *newPage = getPageFromBTreeFile(RRN);
         return newPage;
     }
 }
+
 
 long pageBinarySearch(int searchKey, record *records, long firstSearch, long lastSearch) {
     long middle = (firstSearch + lastSearch) / 2;
 
     if(records[middle].key == searchKey || (middle == firstSearch && middle == lastSearch)) { return middle; }
 
-    if(records[middle].key < searchKey)
+    if(records[middle].key < searchKey) { 
         return pageBinarySearch(searchKey, records, middle+1, lastSearch);
-    else
-        return pageBinarySearch(searchKey, records, firstSearch, middle); 
+    }
+
+    return pageBinarySearch(searchKey, records, firstSearch, middle); 
 }
+
 
 long bTreeSearch(int searchKey) {
     FILE *bFile = fopen(BTREEFILENAME, "r+");
     newPageInfo *newPage = getOrCreateRoot(bFile);
-
-    int elementPosition = _bTreeSearch(newPage, searchKey);
-    
-    if(elementPosition == -1)
-        return -1; //Não encontrou a chave
-    else
-        return newPage->bPage->records[elementPosition].RRN; //Retorna o RRN da chave encontrada
 
     return _bTreeSearch(newPage, searchKey);
 }
@@ -84,8 +86,7 @@ long _bTreeSearch(newPageInfo *newPage, int searchKey) {
         return _bTreeSearch(searchPage, searchKey);
     }
 
-    else 
-        return -1; //Chave não encontrada
+    else { return -1; } //Chave não encontrada
 }
 
 
@@ -308,6 +309,7 @@ int headerUpdate(promotedKey *promoted, FILE* bFile) {
 
     return 0;
 }
+
 
 
 //Imprimir nó - Apenas para debugging
