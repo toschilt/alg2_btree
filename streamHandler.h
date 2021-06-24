@@ -10,6 +10,8 @@
  * com manipulação de streams, seja stdin ou arquivos.
 */
 
+
+#include "student.h"
 #include "btree.h"
 #include "student.h"
 #include <string.h>
@@ -56,6 +58,12 @@ void insertNodeInBTreeFile(newPageInfo *newPage, FILE *bFile, long RRN);
  * Busca um registro no arquivo de dados. Retorna o RNN correspondente.
 */
 long getRecordsInDataFile();
+
+/*
+ * Recupera a página do arquivo da BTree.
+ * MELHORAR ????????????????????????????????????????????????
+*/
+newPageInfo *getPageFromBTreeFile(long RRN);
 
 /*
  * Recupera a página do arquivo da BTree.
