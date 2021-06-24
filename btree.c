@@ -122,12 +122,17 @@ int _bTreeInsert(record *newRecord, newPageInfo *newPage, promotedKey **promoted
         //Chama a recursão na subárvore adequada
 
         if(*promoted == NULL) { return 0; } //Inserção realizada com sucesso
+
+        (*promoted)->childs[0] /= PAGESIZE;
+        (*promoted)->childs[1] /= PAGESIZE;
         
         //Inserção com overflow, necessidade de inserir promoted
         //TODO caso esta página seja a raíz, é necessário overflow
         int insertPoint = pageBinarySearch((*promoted)->rec->key, newPage->bPage->records, 0, newPage->bPage->numRecords);
         bTreeInsertIntoPage((*promoted)->rec, promoted, newPage, insertPoint);
+        
         printf("Key %d RRN %ld\nC0 %ld C1 %ld\n", (*promoted)->rec->key, (*promoted)->rec->RRN, (*promoted)->childs[0], (*promoted)->childs[1]);
+        
         *promoted = NULL; //É necessário atualizar para null, se não todo overflow atualiza a raíz
         return status;
     }
