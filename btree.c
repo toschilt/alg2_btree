@@ -112,7 +112,8 @@ int bTreeInsert(record *newRecord) {
 int _bTreeInsert(record *newRecord, newPageInfo *newPage, promotedKey **promoted) {
 
     int insertPoint = pageBinarySearch(newRecord->key, newPage->bPage->records, 0, newPage->bPage->numRecords);
-    if(newPage->bPage->records[insertPoint].key == newRecord->key) { return 1; } //Chave ja existe, retorna erro
+    
+    if(insertPoint != MAXKEYS - 1 && newPage->bPage->records[insertPoint].key == newRecord->key) { return 1; } //Chave ja existe, retorna erro
 
     int status;
     if(!newPage->bPage->isLeaf) { //Caso não seja folha
@@ -127,13 +128,9 @@ int _bTreeInsert(record *newRecord, newPageInfo *newPage, promotedKey **promoted
         //TODO caso esta página seja a raíz, é necessário overflow
         int insertPoint = pageBinarySearch((*promoted)->rec->key, newPage->bPage->records, 0, newPage->bPage->numRecords);
         bTreeInsertIntoPage((*promoted)->rec, promoted, newPage, insertPoint);
-        
-        printf("Key %d RRN %ld\nC0 %ld C1 %ld\n", (*promoted)->rec->key, (*promoted)->rec->RRN, (*promoted)->childs[0], (*promoted)->childs[1]);
-        
-        *promoted = NULL; //É necessário atualizar para null, se não todo overflow atualiza a raíz
+            
         return status;
     }
-
     else {
         bTreeInsertIntoPage(newRecord, promoted, newPage, insertPoint);
     }
@@ -183,7 +180,6 @@ promotedKey *promoteKey(record *rec, int LeftRRN, int RightRRN) {
 void bTreeInsertIntoPage(record *newRecord, promotedKey **promoted, newPageInfo *newPage, long insertPosition) {
 
     if(newPage->bPage->numRecords == MAXKEYS - 1) {
-
         //Nó está cheio, overflow
         newPageInfo *createdPage = (newPageInfo*)malloc(sizeof(newPageInfo));
         createdPage->bPage = createPage();
@@ -258,7 +254,6 @@ void bTreeInsertIntoPage(record *newRecord, promotedKey **promoted, newPageInfo 
         insertNodeInBTreeFile(createdPage, fp, createdPage->RRN);
 
     }
-
     else {
         if(*promoted != NULL) {
             //Precisa atualizar os filhos
@@ -272,7 +267,6 @@ void bTreeInsertIntoPage(record *newRecord, promotedKey **promoted, newPageInfo 
             newPage->bPage->childs[insertPosition + 1] = (*promoted)->childs[1];
             newPage->bPage->childs[insertPosition] = (*promoted)->childs[0];
         }
-
         else {
             //Não precisa mexer nos filhos
             for(int i = (MAXKEYS - 2); i > insertPosition; i--) {
@@ -284,6 +278,8 @@ void bTreeInsertIntoPage(record *newRecord, promotedKey **promoted, newPageInfo 
         newPage->bPage->records[insertPosition].key = newRecord->key;
         newPage->bPage->records[insertPosition].RRN = newRecord->RRN;
         newPage->bPage->numRecords++;
+
+        *promoted = NULL;
     }
 }
 

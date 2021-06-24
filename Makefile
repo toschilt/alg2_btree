@@ -4,7 +4,7 @@ BINARY=main
 
 
 all:
-	gcc -Wall $(MAIN) $(UTIL) -o $(BINARY) -lm
+	gcc -g -Wall $(MAIN) $(UTIL) -o $(BINARY) -lm
 
 run:
 	./$(BINARY)
