@@ -93,7 +93,7 @@ long bTreeSearch(int key);
  * chave (número inteiro) e da página a ser buscada.
  * Retorna o índice do registro buscado.
 */
-int _bTreeSearch(newPageInfo *newPage, int searchKey);
+long _bTreeSearch(newPageInfo *newPage, int searchKey);
 
 /*
  * Função que realiza a busca binária na página da BTree a partir do vetor
