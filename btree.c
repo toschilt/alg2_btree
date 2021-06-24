@@ -142,7 +142,7 @@ int _bTreeInsert(record *newRecord, newPageInfo *newPage, promotedKey **promoted
 // *Função para inserir dados em nova página em caso de overflow
 void insertPageData(bTreePage *bPage, bTreePage *createdPage, long startingPosition) {
     
-    createdPage->numRecords = bPage->numRecords - startingPosition + 1;
+    createdPage->numRecords = bPage->numRecords - startingPosition;
 
     for(long i = 0; i < createdPage->numRecords - 1; i++) {
         createdPage->childs[i] = bPage->childs[i + startingPosition];
@@ -201,7 +201,6 @@ void bTreeInsertIntoPage(record *newRecord, promotedKey **promoted, newPageInfo 
                 promotedIndex = MAXKEYS / 2 - 2; 
             }
         }
-
         else {
             maxKeysIsOdd = 1;
             if(insertPosition > MAXKEYS / 2) { 
@@ -224,9 +223,18 @@ void bTreeInsertIntoPage(record *newRecord, promotedKey **promoted, newPageInfo 
         }
 
         *promoted = promoteKey(rec, newPage->RRN, createdPage->RRN);
-        insertPageData(newPage->bPage, createdPage->bPage, promotedIndex + 1);
-        if(!insertPlace) { cleanPageData(newPage->bPage, promotedIndex + 1); }
-        else { cleanPageData(newPage->bPage, promotedIndex); }
+        
+        if(insertPlace == 1)
+            insertPageData(newPage->bPage, createdPage->bPage, promotedIndex + 1);
+        else
+            insertPageData(newPage->bPage, createdPage->bPage, promotedIndex + 1);
+            
+        if(insertPlace == -1)
+            cleanPageData(newPage->bPage, promotedIndex);
+        else if(insertPlace == 0)
+            cleanPageData(newPage->bPage, promotedIndex + 1);
+        else
+            cleanPageData(newPage->bPage, promotedIndex);
         
 
         if(insertPlace == 1) {
@@ -291,8 +299,8 @@ int headerUpdate(promotedKey *promoted, FILE* bFile) {
     printf("Atualizei header\n");
     newPageInfo *newPage = (newPageInfo*)malloc(sizeof(newPageInfo));
     newPage->bPage = createPage();
-    fseek(bFile, sizeof(int), SEEK_SET);
-    newPage->RRN = ftell(bFile);
+    fseek(bFile, 0, SEEK_END);
+    newPage->RRN = ftell(bFile)/PAGESIZE;
     newPage->bPage->isLeaf = 0;
     //Aloca uma nova página
 

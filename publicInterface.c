@@ -51,7 +51,7 @@ void printTree(newPageInfo *newPage) {
         printf("\n\n");
         for(int i = 0; i <= newPage->bPage->numRecords; i++) {
             newPageInfo *nP = getPageFromBTreeFile(newPage->bPage->childs[i]);
-            printNode(nP->bPage);
+            printTree(nP);
         }
     }
 }
