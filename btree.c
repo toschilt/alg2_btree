@@ -71,19 +71,18 @@ long bTreeSearch(int searchKey) {
     FILE *bFile = fopen(BTREEFILENAME, "r+");
     newPageInfo *newPage = getOrCreateRoot(bFile);
 
-    int elementPosition = _bTreeSearch(newPage, searchKey);
-    if(elementPosition == -1) { return -1; } //Não encontrou a chave
-    return newPage->bPage->records[elementPosition].RRN; //Retorna o RRN da chave encontrada
+    return _bTreeSearch(newPage, searchKey);
 }
 
 
-int _bTreeSearch(newPageInfo *newPage, int searchKey) {
+long _bTreeSearch(newPageInfo *newPage, int searchKey) {
     long elementPosition = pageBinarySearch(searchKey, newPage->bPage->records, 0, newPage->bPage->numRecords);
 
-    if(newPage->bPage->records[elementPosition].key == searchKey) { return elementPosition; }
+    if(newPage->bPage->records[elementPosition].key == searchKey) { return newPage->bPage->records[elementPosition].RRN; }
 
     if(!newPage->bPage->isLeaf) { //Caso não seja folha
         newPageInfo *searchPage = getPageFromBTreeFile(newPage->bPage->childs[elementPosition]);
+        printNode(searchPage->bPage);
         return _bTreeSearch(searchPage, searchKey);
     }
 
@@ -143,7 +142,7 @@ int _bTreeInsert(record *newRecord, newPageInfo *newPage, promotedKey **promoted
 
 // *Função para inserir dados em nova página em caso de overflow
 void insertPageData(bTreePage *bPage, bTreePage *createdPage, long startingPosition) {
-    createdPage->numRecords = bPage->numRecords - startingPosition;
+    createdPage->numRecords = bPage->numRecords - startingPosition + 1;
 
     for(long i = 0; i < createdPage->numRecords; i++) {
         createdPage->childs[i] = bPage->childs[i + startingPosition];
@@ -156,7 +155,7 @@ void insertPageData(bTreePage *bPage, bTreePage *createdPage, long startingPosit
 void cleanPageData(bTreePage *bPage, long startingPosition) {
     
     if(MAXKEYS % 2 == 0) { bPage->numRecords = startingPosition; }
-    else { bPage->numRecords = startingPosition + 1; }
+    else { bPage->numRecords = startingPosition; }
 
     for(long i = startingPosition; i < MAXKEYS; i++) {
         bPage->childs[i] = -1;

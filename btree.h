@@ -36,7 +36,7 @@ newPageInfo *createRoot(FILE *bFile);
 newPageInfo *getOrCreateRoot(FILE *bFile);
 
 long bTreeSearch(int key);
-int _bTreeSearch(newPageInfo *newPage, int searchKey);
+long _bTreeSearch(newPageInfo *newPage, int searchKey);
 long pageBinarySearch(int searchKey, record *records, long firstSearch, long lastSearch);
 
 int bTreeInsert(record *newRecord);
