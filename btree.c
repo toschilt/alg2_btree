@@ -66,20 +66,6 @@ long pageBinarySearch(int searchKey, record *records, long firstSearch, long las
     return pageBinarySearch(searchKey, records, firstSearch, middle); 
 }
 
-//TALVEZ JUNTAR AMBAS AS FUNÇÕES DE BUSCA BINÁRIA EM 1 SÓ, COM O FLAG DE TIPO DE OPERAÇÃO, DADO QUE SÃO EXATAMENTE O MSM CÓDIGO
-// long binarySearchForInsertion(int searchKey, record *records, long firstSearch, long lastSearch) {
-//     long middle = (firstSearch + lastSearch) / 2;
-  
-//     if(records[middle].key == searchKey) { return -1; }
-//     if(middle == firstSearch && middle == lastSearch) { return middle; }
-
-//     if(records[middle].key < searchKey) { 
-//         return binarySearchForInsertion(searchKey, records, middle+1, lastSearch);
-//     }
-
-//     return binarySearchForInsertion(searchKey, records, firstSearch, middle);  
-// }
-
 
 long bTreeSearch(int searchKey) {
     FILE *bFile = fopen(BTREEFILENAME, "r+");
@@ -97,16 +83,8 @@ int _bTreeSearch(newPageInfo *newPage, int searchKey) {
     if(newPage->bPage->records[elementPosition].key == searchKey) { return elementPosition; }
 
     if(!newPage->bPage->isLeaf) { //Caso não seja folha
-        if(searchKey > newPage->bPage->records[MAXKEYS-1].key && newPage->bPage->numRecords == MAXKEYS - 1) {
-            newPageInfo *searchPage = getPageFromBTreeFile(newPage->bPage->childs[elementPosition]);
-            return _bTreeSearch(searchPage, searchKey);
-            //Esse nó tá cheio e minha chave é maior que o último, preciso descer em isnertPoint+1
-            //TODO ver se é realmente necessário
-        } else {
-            newPageInfo *searchPage = getPageFromBTreeFile(newPage->bPage->childs[elementPosition]);
-            return _bTreeSearch(searchPage, searchKey);
-            //Chama a recursão na subárvore adequada
-        }
+        newPageInfo *searchPage = getPageFromBTreeFile(newPage->bPage->childs[elementPosition]);
+        return _bTreeSearch(searchPage, searchKey);
     }
 
     else { return -1; } //Chave não encontrada
