@@ -15,7 +15,7 @@
 #include <stdlib.h>
 
 #define PAGESIZE 4096
-#define MAXKEYS 5
+#define MAXKEYS 205
 
 
 /*
@@ -88,6 +88,8 @@ long pageBinarySearch(int searchKey, record *records, long firstSearch, long las
  * Função responsável por imprimir uma página da BTree para o usuário.
 */
 void printNode(bPageInfo *bPage);
+void printPromoted(promotedKey *promoted);
+void printArray(long *childsArray);
 
 
 #endif

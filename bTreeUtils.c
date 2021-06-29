@@ -76,3 +76,19 @@ void printNode(bPageInfo *bInfo) {
         } else { printf("\n\n"); }
     }
 }
+
+
+void printPromoted(promotedKey *promoted) {
+    printf("\nCHILD 0: %ld - CHILD 1: %ld\n", promoted->childs[0], promoted->childs[1]);
+    printf("KEY: %d - RRN: %ld\n\n", promoted->rec->key, promoted->rec->RRN);
+}
+
+
+void printArray(long *childsArray) {
+    //Impressão - Remover depois
+    printf("\nArray de Filhos\n");
+    for(int i = 0; i < MAXKEYS + 1; i++) {
+        printf("%d: %ld\n", i, childsArray[i]);
+    }
+    printf("\n");
+}
