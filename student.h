@@ -11,9 +11,9 @@
 */
 
 
-#define NOMESIZE 20
-#define SOBRENOMESIZE 20
-#define CURSOSIZE 25
+#define NOMESIZE 50
+#define SOBRENOMESIZE 50
+#define CURSOSIZE 50
 
 
 /*
