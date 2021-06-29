@@ -3,6 +3,15 @@
 
 #include "bTreeUtils.h"
 
+/*
+ * Algoritmos e Estruturas de Dados II
+ * Autores: Lucas Toschi, Murilo Todão e Marcos Ordonha (Grupo 15)
+ * 
+ * BTREESEARCH.H
+ * Neste arquivo estão todas as funções e estruturas que estão
+ * relacionadas com a parte de busca da BTree.
+*/
+
 
 /*
  * Função que inicia a busca na BTree a partir de uma

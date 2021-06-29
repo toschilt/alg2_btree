@@ -3,7 +3,7 @@
 
 /*
  * Algoritmos e Estruturas de Dados II
- * Autores: Lucas Toschi e Murilo Todão (Grupo 7)
+ * Autores: Lucas Toschi, Murilo Todão e Marcos Ordonha (Grupo 15)
  * 
  * STUDENT.H
  * Neste arquivo estão as funções e estruturas que definem e operam

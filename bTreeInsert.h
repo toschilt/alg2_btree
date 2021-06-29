@@ -3,8 +3,16 @@
 
 #include "bTreeUtils.h"
 
+/*
+ * Algoritmos e Estruturas de Dados II
+ * Autores: Lucas Toschi, Murilo Todão e Marcos Ordonha (Grupo 15)
+ * 
+ * BTREEINSERT.H
+ * Neste arquivo estão todas as funções e estruturas que estão
+ * relacionadas com a inserção de registros na BTree.
+*/
 
-//INSERÇÃO NA BTREE
+
 /*
  * Função que inicia a inserção na BTree a partir de um registro
  * específico

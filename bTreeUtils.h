@@ -3,11 +3,11 @@
 
 /*
  * Algoritmos e Estruturas de Dados II
- * Autores: Lucas Toschi e Murilo Todão (Grupo 7)
+ * Autores: Lucas Toschi, Murilo Todão e Marcos Ordonha (Grupo 15)
  * 
- * BTREE.H
+ * BTREEUTILS.H
  * Neste arquivo estão todas as funções e estruturas que estão
- * relacionadas com o funcionamento intrínseco da BTree.
+ * relacionadas com o funcionamento geral intrínseco da BTree.
 */
 
 
