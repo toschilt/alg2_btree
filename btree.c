@@ -161,22 +161,32 @@ int _bTreeInsert(record *newRecord, bPageInfo *bInfo, promotedKey **promoted) {
 
 // *Função para inserir dados em nova página em caso de overflow
 void insertPageData(bTreePage *bPage, bTreePage *createdPage, long startingPosition) {
-    
-    createdPage->numRecords = bPage->numRecords - startingPosition + 1;
+
+    if(startingPosition >= MAXKEYS / 2 + 1) {
+        createdPage->numRecords = startingPosition - 1;
+        bPage->numRecords = MAXKEYS - startingPosition;
+    } else {
+        createdPage->numRecords = startingPosition;
+        bPage->numRecords = MAXKEYS - startingPosition - 1;
+    }
+
 
     //Copia informações do fim da página com overflow para a página nova
-    printf("Starting insertpage: %ld\n", startingPosition);
-    for(long i = 0; i < createdPage->numRecords - 1; i++) {
-        createdPage->childs[i] = bPage->childs[i + startingPosition];
-        createdPage->records[i].key = bPage->records[i + startingPosition].key;
-        createdPage->records[i].RRN = bPage->records[i + startingPosition].RRN;
+    printf("Starting insertpage: %d\n", createdPage->numRecords);
+    for(long i = 0; i < startingPosition - 1; i++) {
+        createdPage->childs[i] = bPage->childs[i + MAXKEYS - startingPosition];
+
+        if(i != (MAXKEYS-1)) {
+            createdPage->records[i].key = bPage->records[i + MAXKEYS - startingPosition].key;
+            createdPage->records[i].RRN = bPage->records[i + MAXKEYS - startingPosition].RRN;
+        }
     }
 }
 
 // *Função para remover dados de uma página com overflow
 void cleanPageData(bTreePage *bPage, long startingPosition) {
     
-    bPage->numRecords = startingPosition;
+    // bPage->numRecords = MAXKEYS - startingPosition - 2;
 
     //Apaga informações inseridas na nova página da página com overflow
     printf("Starting clean: %ld\n", startingPosition);
@@ -231,7 +241,6 @@ void bTreeInsertIntoPage(record *newRecord, promotedKey **promoted, bPageInfo *b
                 promotedIndex = MAXKEYS / 2 - 2; 
             }
         }
-
         else {
             maxKeysIsOdd = 1;
             if(insertPosition > MAXKEYS / 2) { 
@@ -254,12 +263,22 @@ void bTreeInsertIntoPage(record *newRecord, promotedKey **promoted, bPageInfo *b
         }
 
         *promoted = promoteKey(rec, bInfo->RRN, createdPage->RRN);
-        printf("Promoted: %ld\n", promotedIndex);
 
-        insertPageData(bInfo->bPage, createdPage->bPage, promotedIndex + 1);
+        printf("Insert: %d\n", newRecordInsertPlace);
         
-        if(!newRecordInsertPlace) { cleanPageData(bInfo->bPage, promotedIndex + 1); }
-        else { cleanPageData(bInfo->bPage, promotedIndex); }
+        if(newRecordInsertPlace == 1)
+            insertPageData(bInfo->bPage, createdPage->bPage, promotedIndex);
+        else if(newRecordInsertPlace == 0)
+            insertPageData(bInfo->bPage, createdPage->bPage, promotedIndex + 2);
+        else
+            insertPageData(bInfo->bPage, createdPage->bPage, promotedIndex + 2);
+            
+        if(newRecordInsertPlace == 1)
+            cleanPageData(bInfo->bPage, promotedIndex);
+        else if(newRecordInsertPlace == 0)
+            cleanPageData(bInfo->bPage, promotedIndex + 1);
+        else
+            cleanPageData(bInfo->bPage, promotedIndex);
         
 
         if(newRecordInsertPlace == 1) {
@@ -287,7 +306,6 @@ void bTreeInsertIntoPage(record *newRecord, promotedKey **promoted, bPageInfo *b
         insertNodeInBTreeFile(createdPage, fp, createdPage->RRN);
 
     }
-
     else {
         if(*promoted != NULL) {
             //Precisa atualizar os filhos
@@ -301,7 +319,6 @@ void bTreeInsertIntoPage(record *newRecord, promotedKey **promoted, bPageInfo *b
             bInfo->bPage->childs[insertPosition + 1] = (*promoted)->childs[1];
             bInfo->bPage->childs[insertPosition] = (*promoted)->childs[0];
         }
-
         else {
             //Não precisa mexer nos filhos
             for(int i = (MAXKEYS - 2); i > insertPosition; i--) {
@@ -326,8 +343,8 @@ int headerUpdate(promotedKey *promoted, FILE* bFile) {
     printf("Atualizei header\n");
     bPageInfo *bInfo = (bPageInfo*)malloc(sizeof(bPageInfo));
     bInfo->bPage = createPage();
-    fseek(bFile, sizeof(int), SEEK_SET);
-    bInfo->RRN = ftell(bFile);
+    fseek(bFile, 0, SEEK_END);
+    bInfo->RRN = ftell(bFile)/PAGESIZE;
     bInfo->bPage->isLeaf = 0;
     //Aloca uma nova página
 
