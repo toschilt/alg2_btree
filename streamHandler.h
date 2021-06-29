@@ -20,7 +20,7 @@
 
 
 /*
- * Leitura de string do usuário com alocação dinâmica.
+ * Leitura de string do usuário a partir da entrada padrão.
 */
 void readString(char *string, char separator);
 

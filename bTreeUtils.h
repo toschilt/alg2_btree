@@ -15,7 +15,7 @@
 #include <stdlib.h>
 
 #define PAGESIZE 4096
-#define MAXKEYS 205
+#define MAXKEYS 5
 
 
 /*
