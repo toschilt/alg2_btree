@@ -15,5 +15,5 @@ void printStudent(studentRegister *student) {
     printf("Sobrenome: %s\n", student->sobrenome);
     printf("Curso: %s\n", student->curso);
     printf("Nota: %.2f\n", student->nota);
-    printf("−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−\n");
+    printf("-------------------------------\n");
 }
