@@ -1,5 +1,5 @@
 MAIN=main.c
-UTIL=btree.c streamHandler.c student.c publicInterface.c
+UTIL=bTreeUtils.c bTreeSearch.c bTreeInsert.c streamHandler.c student.c publicInterface.c
 BINARY=main
 
 

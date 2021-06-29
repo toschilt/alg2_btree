@@ -21,7 +21,7 @@ void insert(studentRegister *student) {
     rec->RRN = getRecordsInDataFile();
     int error = bTreeInsert(rec);
 
-    if(error) {
+    if(error == -1) {
         printf("O registro já existe\n");
         return;
     }
@@ -43,15 +43,16 @@ void update(studentRegister *student) {
 
 
 
-void printTree(bPageInfo *newPage) {
+void printTree(bPageInfo *bInfo) {
     printf("\n");
-    printNode(newPage->bPage);
+    printNode(bInfo->bPage);
 
-    if(!newPage->bPage->isLeaf) {
-        printf("\n\n");
-        for(int i = 0; i <= newPage->bPage->numRecords; i++) {
-            bPageInfo *nP = getPageFromBTreeFile(newPage->bPage->childs[i]);
-            printNode(nP->bPage);
+    if(!bInfo->bPage->isLeaf) {
+        printf("\n");
+        for(int i = 0; i <= bInfo->bPage->numRecords; i++) {
+            printf("\n");
+            bPageInfo *nP = getPageFromBTreeFile(bInfo->bPage->childs[i]);
+            printTree(nP);
         }
     }
 }
@@ -59,6 +60,6 @@ void printTree(bPageInfo *newPage) {
 
 void print() {
     FILE *fp = fopen(BTREEFILENAME, "r+");
-    bPageInfo *newPage = getOrCreateRoot(fp);
-    printTree(newPage);
+    bPageInfo *bInfo = getOrCreateRoot(fp);
+    printTree(bInfo);
 }

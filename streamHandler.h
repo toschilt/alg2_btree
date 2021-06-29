@@ -12,7 +12,7 @@
 
 
 #include "student.h"
-#include "btree.h"
+#include "bTreeUtils.h"
 #include <string.h>
 
 #define BTREEFILENAME "btree.dat"

@@ -1,4 +1,4 @@
-#include "btree.h"
+#include "bTreeUtils.h"
 #include "streamHandler.h"
 #include "publicInterface.h"
 #include "student.h"
@@ -13,12 +13,10 @@ int main(int argc, char *argv[]) {
     char function[20];
 
     //Criação dos documentos binários, pode ser melhorado
-    FILE *fp = fopen(BTREEFILENAME, "w");
-    fclose(fp);
-
-    FILE *dataf = fopen(DATAFILENAME, "w");
-    fclose(dataf);
-
+    fopen(BTREEFILENAME, "w"); 
+    fopen(DATAFILENAME, "w");
+    
+    
     while(1) { //Loop infinito
         readString(function, ' '); //Lê a entrada do usuário, passando o espaço como separador
         
