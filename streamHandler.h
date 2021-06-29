@@ -52,7 +52,7 @@ void updateStudent(studentRegister *student, long RRN);
 /*
  * Insere um novo nó da árvore BTree no arquivo correspondente.
 */
-void insertNodeInBTreeFile(newPageInfo *newPage, FILE *bFile, long RRN);
+void insertNodeInBTreeFile(bPageInfo *newPage, FILE *bFile, long RRN);
 
 /*
  * Busca um registro no arquivo de dados. Retorna o RNN correspondente.
@@ -63,7 +63,7 @@ long getRecordsInDataFile();
  * Recupera a página do arquivo da BTree.
  * MELHORAR ????????????????????????????????????????????????
 */
-newPageInfo *getPageFromBTreeFile(long RRN);
+bPageInfo *getPageFromBTreeFile(long RRN);
 
 
 #endif

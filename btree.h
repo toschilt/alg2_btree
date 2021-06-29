@@ -58,7 +58,7 @@ typedef struct {
 typedef struct {
     bTreePage *bPage;
     long RRN;
-} newPageInfo;
+} bPageInfo;
 
 
 
@@ -71,12 +71,12 @@ bTreePage *createPage();
 /*
  * Função responsável por criar a raíz da BTree.
 */
-newPageInfo *createRoot(FILE *bFile);
+bPageInfo *createRoot(FILE *bFile);
 
 /*
  * Função responsável por encontrar ou criar a raíz da BTree.
 */
-newPageInfo *getOrCreateRoot(FILE *bFile);
+bPageInfo *getOrCreateRoot(FILE *bFile);
 
 
 
@@ -93,7 +93,7 @@ long bTreeSearch(int key);
  * chave (número inteiro) e da página a ser buscada.
  * Retorna o índice do registro buscado.
 */
-long _bTreeSearch(newPageInfo *newPage, int searchKey);
+long _bTreeSearch(bPageInfo *newPage, int searchKey);
 
 /*
  * Função que realiza a busca binária na página da BTree a partir do vetor
@@ -120,12 +120,12 @@ int bTreeInsert(record *newRecord);
  * Função recursiva que percorre a árvore para inserção de um registro.
  * Já realiza o tratamento de nós promovidos.
 */
-int _bTreeInsert(record *newRecord, newPageInfo *newPage, promotedKey **promoted);
+int _bTreeInsert(record *newRecord, bPageInfo *newPage, promotedKey **promoted);
 
 /*
  * Função que realiza a inserção de um registro em uma página específica da BTree.
 */
-void bTreeInsertIntoPage(record *newRecord, promotedKey **promoted, newPageInfo *newPage, long insertPosition);
+void bTreeInsertIntoPage(record *newRecord, promotedKey **promoted, bPageInfo *newPage, long insertPosition);
 
 /*
  * Função responsável pela atualização da página header da BTree.

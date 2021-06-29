@@ -79,7 +79,7 @@ long getRecordsInDataFile() {
 
 
 
-void insertNodeInBTreeFile(newPageInfo *newPage, FILE *bFile, long RRN) {
+void insertNodeInBTreeFile(bPageInfo *newPage, FILE *bFile, long RRN) {
     if(RRN == -1) { fseek(bFile, 0, SEEK_END); } //Caso RRN seja -1, insere no fim
     else { fseek(bFile, RRN * PAGESIZE, SEEK_SET); } //Caso contrário, insere em posição específica
     
@@ -89,9 +89,9 @@ void insertNodeInBTreeFile(newPageInfo *newPage, FILE *bFile, long RRN) {
 
 
 
-newPageInfo *getPageFromBTreeFile(long RRN) {
+bPageInfo *getPageFromBTreeFile(long RRN) {
     FILE *filePointer = fopen(BTREEFILENAME, "r+");
-    newPageInfo *newPage = (newPageInfo*)malloc(PAGESIZE);
+    bPageInfo *newPage = (bPageInfo*)malloc(PAGESIZE);
 
     fseek(filePointer, RRN * PAGESIZE, SEEK_SET);    
     fread(newPage, PAGESIZE, 1, filePointer);
