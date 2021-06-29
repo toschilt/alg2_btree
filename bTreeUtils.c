@@ -7,9 +7,9 @@ bTreePage *createPage() {
     bPage->numRecords = 0;
     bPage->isLeaf = 1;
     
-    for(int i = 0; i < MAXKEYS; i++) {
+    for(int i = 0; i < MAXCHILDS; i++) {
         bPage->childs[i] = -1;
-        if(i != (MAXKEYS-1)) { 
+        if(i != (MAXCHILDS-1)) { 
             bPage->records[i].key = 0;
             bPage->records[i].RRN = -1;
         }
@@ -67,10 +67,10 @@ long pageBinarySearch(int searchKey, record *records, long firstSearch, long las
 // *Imprimir nó - Apenas para debugging
 void printNode(bPageInfo *bInfo) {
     printf("Records: %d - isLeaf: %d - RRN: %ld\n\n", bInfo->bPage->numRecords, bInfo->bPage->isLeaf, bInfo->RRN);
-    for(int i = 0; i < MAXKEYS; i++) {
+    for(int i = 0; i < MAXCHILDS; i++) {
         printf("CHILD: %ld ", bInfo->bPage->childs[i]);
         
-        if(i != (MAXKEYS - 1)) { 
+        if(i != (MAXCHILDS - 1)) { 
             printf("KEY: %d ", bInfo->bPage->records[i].key);
             printf("RRN: %ld\n", bInfo->bPage->records[i].RRN);
         } else { printf("\n\n"); }
@@ -87,7 +87,7 @@ void printPromoted(promotedKey *promoted) {
 void printArray(long *childsArray) {
     //Impressão - Remover depois
     printf("\nArray de Filhos\n");
-    for(int i = 0; i < MAXKEYS + 1; i++) {
+    for(int i = 0; i < MAXCHILDS + 1; i++) {
         printf("%d: %ld\n", i, childsArray[i]);
     }
     printf("\n");

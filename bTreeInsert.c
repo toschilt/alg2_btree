@@ -37,7 +37,7 @@ int _bTreeInsert(record *newRecord, bPageInfo *bInfo, promotedKey **promoted) {
     //Encontra o índice da chave na página
 
     //Verifica se o elemento já existe no nó
-    if(insertPoint < MAXKEYS - 1 && bInfo->bPage->records[insertPoint].key == newRecord->key) { 
+    if(insertPoint < MAXCHILDS - 1 && bInfo->bPage->records[insertPoint].key == newRecord->key) { 
         //Chave ja existe, retorna erro
         return -1;
     } 
@@ -73,25 +73,25 @@ int _bTreeInsert(record *newRecord, bPageInfo *bInfo, promotedKey **promoted) {
 void insertPageData(bTreePage *bPage, bTreePage *createdPage, long *childsArray, long startingPosition) {
 
     //Seta a quantidade de elementos por página de acordo com a posição de inserção
-    if(startingPosition >= MAXKEYS / 2 + 1) {
+    if(startingPosition >= MAXCHILDS / 2 + 1) {
         createdPage->numRecords = startingPosition - 1;
-        bPage->numRecords = MAXKEYS - startingPosition;
+        bPage->numRecords = MAXCHILDS - startingPosition;
     } else {
         createdPage->numRecords = startingPosition;
-        bPage->numRecords = MAXKEYS - startingPosition - 1;
+        bPage->numRecords = MAXCHILDS - startingPosition - 1;
     }
 
     //Copia informações do fim da página com overflow para a página nova
     for(long i = 0; i < startingPosition - 1; i++) {
-        createdPage->records[i].key = bPage->records[i + MAXKEYS - startingPosition].key;
-        createdPage->records[i].RRN = bPage->records[i + MAXKEYS - startingPosition].RRN;
+        createdPage->records[i].key = bPage->records[i + MAXCHILDS - startingPosition].key;
+        createdPage->records[i].RRN = bPage->records[i + MAXCHILDS - startingPosition].RRN;
     }
 
     if(childsArray != NULL) {
-        for(int i = 0; i < MAXKEYS; i++) {
+        for(int i = 0; i < MAXCHILDS; i++) {
 
-            if(i <= MAXKEYS - bPage->numRecords - 1) { 
-                createdPage->childs[i] = childsArray[i + MAXKEYS - bPage->numRecords]; 
+            if(i <= MAXCHILDS - bPage->numRecords - 1) { 
+                createdPage->childs[i] = childsArray[i + MAXCHILDS - bPage->numRecords]; 
             } else { 
                 createdPage->childs[i] = -1; 
             }
@@ -103,16 +103,16 @@ void insertPageData(bTreePage *bPage, bTreePage *createdPage, long *childsArray,
 void cleanPageData(bTreePage *bPage, long *childsArray, long startingPosition) {
     
     //Apaga informações inseridas na nova página da página com overflow
-    for(long i = startingPosition; i < MAXKEYS - 1; i++) {
+    for(long i = startingPosition; i < MAXCHILDS - 1; i++) {
         bPage->records[i].key = 0;
         bPage->records[i].RRN = -1;
     }
 
     if(childsArray != NULL) {
-        for(int i = 0; i < MAXKEYS; i++) {
+        for(int i = 0; i < MAXCHILDS; i++) {
             
             if(i <= bPage->numRecords) { 
-                bPage->childs[i] = childsArray[i]; 
+                bPage->childs[i] = childsArray[i];
             } else { 
                 bPage->childs[i] = -1; 
             }
@@ -131,13 +131,13 @@ promotedKey *promoteKey(record *rec, int LeftRRN, int RightRRN) {
     return promoted;
 }
 
-// *Função para criar um vetor de MAXKEYS + 1 posições, contendo a informação
+// *Função para criar um vetor de MAXCHILDS + 1 posições, contendo a informação
 // *de todos os filhos que precisarão ser alocados depois
 long *createChildsArray(bPageInfo *bInfo, promotedKey *promoted) {
-    static long childsArray[MAXKEYS + 1];
+    static long childsArray[MAXCHILDS + 1];
     int found = 0;
 
-    for(int i = 0; i < MAXKEYS + 1; i++) {
+    for(int i = 0; i < MAXCHILDS + 1; i++) {
         
         childsArray[i + found] = bInfo->bPage->childs[i];
 
@@ -154,7 +154,7 @@ long *createChildsArray(bPageInfo *bInfo, promotedKey *promoted) {
 // *Função para inserir uma nova chave em um nó
 void bTreeInsertIntoPage(record *newRecord, promotedKey **promoted, bPageInfo *bInfo, long insertPosition) {
 
-    if(bInfo->bPage->numRecords == MAXKEYS - 1) {
+    if(bInfo->bPage->numRecords == MAXCHILDS - 1) {
 
         //Nó está cheio, overflow
         bPageInfo *createdPage = (bPageInfo*)malloc(sizeof(bPageInfo));
@@ -171,7 +171,7 @@ void bTreeInsertIntoPage(record *newRecord, promotedKey **promoted, bPageInfo *b
         //  1 - Chave inserida na direita 
         // -1 - Chave inserida na esquerda
 
-        int maxKeysIsOdd = 0;
+        int MaxChildsIsOdd = 0;
         long promotedIndex;
         
         long *childsArray = NULL;
@@ -184,13 +184,13 @@ void bTreeInsertIntoPage(record *newRecord, promotedKey **promoted, bPageInfo *b
             childsArray = createChildsArray(bInfo, *promoted);
         }
 
-        if(MAXKEYS % 2 == 0) {
-            if(insertPosition > MAXKEYS / 2 - 1) {
+        if(MAXCHILDS % 2 == 0) {
+            if(insertPosition > MAXCHILDS / 2 - 1) {
                 //É necessário inserir o elemento na direita
-                promotedIndex = MAXKEYS / 2 - 1; 
+                promotedIndex = MAXCHILDS / 2 - 1; 
                 newRecordInsertPlace = 1;
             } else { 
-                if(insertPosition == MAXKEYS / 2 - 1) { 
+                if(insertPosition == MAXCHILDS / 2 - 1) { 
                     //Novo record corresponde a chave promovida
                     newRecordInsertPlace = 0; 
                 } else { 
@@ -198,24 +198,24 @@ void bTreeInsertIntoPage(record *newRecord, promotedKey **promoted, bPageInfo *b
                     newRecordInsertPlace = -1; 
                 } 
 
-                promotedIndex = MAXKEYS / 2 - 2; 
+                promotedIndex = MAXCHILDS / 2 - 2; 
             }
         }
         else {
-            //Idem ao caso acima, mas para MAXKEYS ímpar
-            maxKeysIsOdd = 1;
-            if(insertPosition > MAXKEYS / 2) { 
-                promotedIndex = MAXKEYS / 2; 
+            //Idem ao caso acima, mas para MAXCHILDS ímpar
+            MaxChildsIsOdd = 1;
+            if(insertPosition > MAXCHILDS / 2) { 
+                promotedIndex = MAXCHILDS / 2; 
                 newRecordInsertPlace = 1;
             
             } else {
-                if(insertPosition == MAXKEYS / 2) { 
+                if(insertPosition == MAXCHILDS / 2) { 
                     newRecordInsertPlace = 0; 
                 } else { 
                     newRecordInsertPlace = -1; 
                 }
 
-                promotedIndex = MAXKEYS / 2 - 1; 
+                promotedIndex = MAXCHILDS / 2 - 1; 
             }
         }
 
@@ -263,11 +263,11 @@ void bTreeInsertIntoPage(record *newRecord, promotedKey **promoted, bPageInfo *b
         // printNode(createdPage);
         
         if(newRecordInsertPlace == 1) {
-            insertPosition -= MAXKEYS / 2;
-            if(maxKeysIsOdd) { insertPosition--; }
+            insertPosition -= MAXCHILDS / 2;
+            if(MaxChildsIsOdd) { insertPosition--; }
 
             //Criar função separada para os for
-            for(int i = (MAXKEYS-2); i > insertPosition; i--) { 
+            for(int i = (MAXCHILDS-2); i > insertPosition; i--) { 
                 createdPage->bPage->records[i].key = createdPage->bPage->records[i-1].key;
                 createdPage->bPage->records[i].RRN = createdPage->bPage->records[i-1].RRN;
             }
@@ -276,7 +276,7 @@ void bTreeInsertIntoPage(record *newRecord, promotedKey **promoted, bPageInfo *b
         }
 
         else if(newRecordInsertPlace == -1) {
-            for(int i = (MAXKEYS-2); i > insertPosition; i--) { 
+            for(int i = (MAXCHILDS-2); i > insertPosition; i--) { 
                 bInfo->bPage->records[i].key = bInfo->bPage->records[i-1].key;
                 bInfo->bPage->records[i].RRN = bInfo->bPage->records[i-1].RRN;
             }
@@ -297,8 +297,8 @@ void bTreeInsertIntoPage(record *newRecord, promotedKey **promoted, bPageInfo *b
     else {
         if(*promoted != NULL) {
             //Precisa atualizar os filhos
-            for(int i = (MAXKEYS - 1); i > insertPosition; i--) {
-                if(i != MAXKEYS - 1) {
+            for(int i = (MAXCHILDS - 1); i > insertPosition; i--) {
+                if(i != MAXCHILDS - 1) {
                     bInfo->bPage->records[i].key = bInfo->bPage->records[i-1].key;
                     bInfo->bPage->records[i].RRN = bInfo->bPage->records[i-1].RRN;
                 }
@@ -310,7 +310,7 @@ void bTreeInsertIntoPage(record *newRecord, promotedKey **promoted, bPageInfo *b
 
         else {
             //Não precisa mexer nos filhos
-            for(int i = (MAXKEYS - 2); i > insertPosition; i--) {
+            for(int i = (MAXCHILDS - 2); i > insertPosition; i--) {
                 bInfo->bPage->records[i].key = bInfo->bPage->records[i-1].key;
                 bInfo->bPage->records[i].RRN = bInfo->bPage->records[i-1].RRN;
             }

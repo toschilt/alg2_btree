@@ -15,7 +15,7 @@
 #include <stdlib.h>
 
 #define PAGESIZE 4096
-#define MAXKEYS 5
+#define MAXCHILDS 171
 
 
 /*
@@ -34,9 +34,9 @@ typedef struct {
  * uma página folha ou não.
 */
 typedef struct {
-    record records[MAXKEYS-1];
-    long childs[MAXKEYS];
-    int numRecords;
+    record records[MAXCHILDS-1];
+    long childs[MAXCHILDS];
+    short numRecords;
     char isLeaf;
 } bTreePage;
 

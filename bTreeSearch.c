@@ -16,7 +16,7 @@ long _bTreeSearch(bPageInfo *bInfo, int searchKey) {
     long insertPoint = pageBinarySearch(searchKey, bInfo->bPage->records, 0, bInfo->bPage->numRecords);
     //Realiza a busca binária para determinar a posição do elemento
 
-    if(insertPoint < MAXKEYS - 1 && bInfo->bPage->records[insertPoint].key == searchKey) { 
+    if(insertPoint < MAXCHILDS - 1 && bInfo->bPage->records[insertPoint].key == searchKey) { 
         return bInfo->bPage->records[insertPoint].RRN; 
     }
     //Caso o elemento seja encontrado, retorna seu RRN
@@ -24,6 +24,7 @@ long _bTreeSearch(bPageInfo *bInfo, int searchKey) {
     if(!bInfo->bPage->isLeaf) { 
         //Caso não seja folha, chama recursão na página adequada
         bPageInfo *searchPage = getPageFromBTreeFile(bInfo->bPage->childs[insertPoint]);
+        free(bInfo);
         return _bTreeSearch(searchPage, searchKey);
     }
 
