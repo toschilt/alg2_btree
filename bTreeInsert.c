@@ -87,6 +87,7 @@ void insertPageData(bTreePage *bPage, bTreePage *createdPage, long *childsArray,
         createdPage->records[i].RRN = bPage->records[i + MAXCHILDS - startingPosition].RRN;
     }
 
+    //Atualiza os filhos da página, caso necessário
     if(childsArray != NULL) {
         for(int i = 0; i < MAXCHILDS; i++) {
 
@@ -108,6 +109,7 @@ void cleanPageData(bTreePage *bPage, long *childsArray, long startingPosition) {
         bPage->records[i].RRN = -1;
     }
 
+    //Atualiza os filhos da página, caso necessário
     if(childsArray != NULL) {
         for(int i = 0; i < MAXCHILDS; i++) {
             
@@ -173,8 +175,9 @@ void bTreeInsertIntoPage(record *newRecord, promotedKey **promoted, bPageInfo *b
 
         int MaxChildsIsOdd = 0;
         long promotedIndex;
+        //Posicionamento da chave inserida e chave promovida
         
-        long *childsArray = NULL;
+        long *childsArray = NULL; //Vetor para armazenar informações de filhos
 
         // printf("Imprimindo nó\n");
         // printNode(bInfo);
@@ -232,6 +235,7 @@ void bTreeInsertIntoPage(record *newRecord, promotedKey **promoted, bPageInfo *b
 
         //Promove rec
         *promoted = promoteKey(rec, bInfo->RRN, createdPage->RRN);
+
         // printf("Promted:\n");
         // printPromoted(*promoted);
         
@@ -261,7 +265,8 @@ void bTreeInsertIntoPage(record *newRecord, promotedKey **promoted, bPageInfo *b
         // printNode(bInfo);
         // printf("Filho 2\n");
         // printNode(createdPage);
-        
+
+        //Insere o novo registro no nó da direita
         if(newRecordInsertPlace == 1) {
             insertPosition -= MAXCHILDS / 2;
             if(MaxChildsIsOdd) { insertPosition--; }
@@ -275,6 +280,7 @@ void bTreeInsertIntoPage(record *newRecord, promotedKey **promoted, bPageInfo *b
             createdPage->bPage->records[insertPosition].RRN = newRecord->RRN;
         }
 
+        //Insere o novo registro no nó da esquerda
         else if(newRecordInsertPlace == -1) {
             for(int i = (MAXCHILDS-2); i > insertPosition; i--) { 
                 bInfo->bPage->records[i].key = bInfo->bPage->records[i-1].key;
@@ -284,6 +290,7 @@ void bTreeInsertIntoPage(record *newRecord, promotedKey **promoted, bPageInfo *b
             bInfo->bPage->records[insertPosition].RRN = newRecord->RRN;
         }
         
+        //Insere a nova página no arquivo da bTree
         insertNodeInBTreeFile(createdPage, fp, createdPage->RRN);
 
         // printf("\n\nImprimindo nós após alteração\n");
@@ -296,7 +303,7 @@ void bTreeInsertIntoPage(record *newRecord, promotedKey **promoted, bPageInfo *b
 
     else {
         if(*promoted != NULL) {
-            //Precisa atualizar os filhos
+            //Precisa atualizar os filhos, houve overflow na iteração anterior
             for(int i = (MAXCHILDS - 1); i > insertPosition; i--) {
                 if(i != MAXCHILDS - 1) {
                     bInfo->bPage->records[i].key = bInfo->bPage->records[i-1].key;
@@ -328,7 +335,6 @@ void bTreeInsertIntoPage(record *newRecord, promotedKey **promoted, bPageInfo *b
 // *Função para atualizar a raíz
 int headerUpdate(promotedKey *promoted, FILE* bFile) {
 
-    // printf("\nAtualizei header\n");
     bPageInfo *bInfo = (bPageInfo*)malloc(sizeof(bPageInfo));
     bInfo->bPage = createPage();
     fseek(bFile, 0, SEEK_END);

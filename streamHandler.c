@@ -22,6 +22,7 @@ studentRegister *searchStudentInDataFile(long RRN) {
     FILE *filePointer = fopen(DATAFILENAME, "r");
     studentRegister *student = (studentRegister*)malloc(getStudentSize());
     fseek(filePointer, RRN * getStudentSize(), SEEK_SET);
+    //Abre o arquivo na posição fornecida
 
     fread(&student->nusp, sizeof(student->nusp), 1, filePointer);
     fread(&student->nome, sizeof(student->nome), 1, filePointer);
@@ -29,20 +30,21 @@ studentRegister *searchStudentInDataFile(long RRN) {
     fread(&student->curso, sizeof(student->curso), 1, filePointer);
     fread(&student->nota, sizeof(student->nota), 1, filePointer);
     fclose(filePointer);
+    //Realiza a leitura do arquivo de dados
 
     return student;
 }
 
 
-static void removeAllChars(char* string, char c) {
+void removeAllChars(char* string, char c) {
     char *readPointer = string, *writePointer = string;
-    while(*readPointer)
-    {
+    while(*readPointer) {
         *writePointer = *readPointer++;
         writePointer += (*writePointer != c);
     }
     *writePointer = '\0';
 }
+
 
 studentRegister *readStudentFromUser() {
     studentRegister *student = (studentRegister*)malloc(getStudentSize());

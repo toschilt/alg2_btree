@@ -62,7 +62,6 @@ typedef struct {
 
 
 
-//INICIALIZAÇÃO E MANUTENÇÃO DA BTREE
 /*
  * Função responsável pela criação de uma página da BTree.
 */
@@ -84,8 +83,9 @@ bPageInfo *getOrCreateRoot(FILE *bFile);
 */
 long pageBinarySearch(int searchKey, record *records, long firstSearch, long lastSearch);
 
+
 /*
- * Função responsável por imprimir uma página da BTree para o usuário.
+ * Funções responsáveis por imprimir informações da árvore
 */
 void printNode(bPageInfo *bPage);
 void printPromoted(promotedKey *promoted);

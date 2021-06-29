@@ -3,7 +3,7 @@
 
 #include "bTreeUtils.h"
 
-//BUSCA NA BTREE
+
 /*
  * Função que inicia a busca na BTree a partir de uma
  * chave (número inteiro).

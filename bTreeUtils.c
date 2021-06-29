@@ -64,6 +64,7 @@ long pageBinarySearch(int searchKey, record *records, long firstSearch, long las
 }
 
 
+
 // *Imprimir nó - Apenas para debugging
 void printNode(bPageInfo *bInfo) {
     printf("Records: %d - isLeaf: %d - RRN: %ld\n\n", bInfo->bPage->numRecords, bInfo->bPage->isLeaf, bInfo->RRN);

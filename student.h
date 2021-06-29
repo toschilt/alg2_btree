@@ -10,10 +10,10 @@
  * sobre o que são consideradas informações de um estudante 
 */
 
-
-#define NOMESIZE 50
-#define SOBRENOMESIZE 50
-#define CURSOSIZE 50
+//Define do tamanho dos campos para cada estudante
+#define NOMESIZE 25
+#define SOBRENOMESIZE 25
+#define CURSOSIZE 25
 
 
 /*

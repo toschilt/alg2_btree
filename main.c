@@ -30,19 +30,19 @@ int main(int argc, char *argv[]) {
             insert(student);
         }
 
-        else if(!strcmp(function, SEARCHFUNCTIONNAME)) {
+        else if(!strcmp(function, SEARCHFUNCTIONNAME)) { //Buscar por estudante (search)
             int key;
             scanf("%d", &key);
             search(key);
         }
 
-        else if(!strcmp(function, UPDATEFUNCTIONNAME)) {
+        else if(!strcmp(function, UPDATEFUNCTIONNAME)) { //Atualizar informações de estudante (update)
             studentRegister *student = (studentRegister*)malloc(getStudentSize());
             student = readStudentFromUser();
             update(student);
         }
 
-        else if(!strcmp(function, "print")) {
+        else if(!strcmp(function, "print")) { //Impressão
             print();
         }
     }

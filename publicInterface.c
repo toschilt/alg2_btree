@@ -43,6 +43,8 @@ void update(studentRegister *student) {
 
 
 
+
+//Funções de impressão, remover
 void printTree(bPageInfo *bInfo) {
     printf("\n");
     printNode(bInfo);

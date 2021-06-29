@@ -1,22 +1,29 @@
 ./main
+Registro nao encontrado!
+Registro nao encontrado!
+Registro nao encontrado!
+Registro nao encontrado!
+Registro nao encontrado!
+Registro nao encontrado!
 −−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−
-nUSP: 1
-Nome: Jenny
-Sobrenome: Steven
+nUSP: 15
+Nome: Gabriel
+Sobrenome: Piruleta
 Curso: Sistemas de Informacao
-Nota: 0.50
+Nota: 8.40
 -------------------------------
+Registro nao encontrado!
+Registro nao encontrado!
+Registro nao encontrado!
+Registro nao encontrado!
+Registro nao encontrado!
 −−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−
-nUSP: 80
-Nome: Rose
-Sobrenome: Jason
-Curso: Sistemas de Informacao
-Nota: 0.90
+nUSP: 18
+Nome: Ronaldinho
+Sobrenome: Gaucho
+Curso: Monstro Sagrado
+Nota: 8.60
 -------------------------------
-−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−
-nUSP: 3562
-Nome: Jennifer
-Sobrenome: Tim
-Curso: Sistemas de Informacao
-Nota: 7.30
--------------------------------
+Registro nao encontrado!
+Registro nao encontrado!
+Registro nao encontrado!
