@@ -51,6 +51,7 @@ bPageInfo *getOrCreateRoot(FILE *bFile) {
     }
 }
 
+
 // *Função para busca binária de chave em nó da árvore
 long pageBinarySearch(int searchKey, record *records, long firstSearch, long lastSearch) {
     long middle = (firstSearch + lastSearch) / 2;
@@ -63,15 +64,15 @@ long pageBinarySearch(int searchKey, record *records, long firstSearch, long las
 }
 
 
-//Imprimir nó - Apenas para debugging
-void printNode(bTreePage *bPage) {
-    printf("Records: %d - isLeaf: %d\n", bPage->numRecords, bPage->isLeaf);
+// *Imprimir nó - Apenas para debugging
+void printNode(bPageInfo *bInfo) {
+    printf("Records: %d - isLeaf: %d - RRN: %ld\n\n", bInfo->bPage->numRecords, bInfo->bPage->isLeaf, bInfo->RRN);
     for(int i = 0; i < MAXKEYS; i++) {
-        printf("CHILD: %ld ", bPage->childs[i]);
+        printf("CHILD: %ld ", bInfo->bPage->childs[i]);
         
-        if(i != (MAXKEYS-1)) { 
-            printf("KEY: %d ", bPage->records[i].key);
-            printf("RRN: %ld\n", bPage->records[i].RRN);
-        } else { printf("\n"); }
+        if(i != (MAXKEYS - 1)) { 
+            printf("KEY: %d ", bInfo->bPage->records[i].key);
+            printf("RRN: %ld\n", bInfo->bPage->records[i].RRN);
+        } else { printf("\n\n"); }
     }
 }

@@ -87,7 +87,7 @@ long pageBinarySearch(int searchKey, record *records, long firstSearch, long las
 /*
  * Função responsável por imprimir uma página da BTree para o usuário.
 */
-void printNode(bTreePage *bPage);
+void printNode(bPageInfo *bPage);
 
 
 #endif

@@ -24,7 +24,6 @@ long _bTreeSearch(bPageInfo *bInfo, int searchKey) {
     if(!bInfo->bPage->isLeaf) { 
         //Caso não seja folha, chama recursão na página adequada
         bPageInfo *searchPage = getPageFromBTreeFile(bInfo->bPage->childs[insertPoint]);
-        printNode(searchPage->bPage);
         return _bTreeSearch(searchPage, searchKey);
     }
 

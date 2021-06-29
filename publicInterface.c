@@ -45,7 +45,7 @@ void update(studentRegister *student) {
 
 void printTree(bPageInfo *bInfo) {
     printf("\n");
-    printNode(bInfo->bPage);
+    printNode(bInfo);
 
     if(!bInfo->bPage->isLeaf) {
         printf("\n");
