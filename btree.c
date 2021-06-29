@@ -99,6 +99,7 @@ int bTreeInsert(record *newRecord) {
     int error = _bTreeInsert(newRecord, newPage, &promoted);
 
     if(error == 1) { return 1; }
+
     if(promoted != NULL) { headerUpdate(promoted, bFile); }
 
     insertNodeInBTreeFile(newPage, bFile, newPage->RRN);
@@ -124,13 +125,12 @@ int _bTreeInsert(record *newRecord, newPageInfo *newPage, promotedKey **promoted
         if(*promoted == NULL) { return 0; } //Inserção realizada com sucesso
 
         //Inserção com overflow, necessidade de inserir promoted
-        //TODO caso esta página seja a raíz, é necessário overflow
         int insertPoint = pageBinarySearch((*promoted)->rec->key, newPage->bPage->records, 0, newPage->bPage->numRecords);
         bTreeInsertIntoPage((*promoted)->rec, promoted, newPage, insertPoint);
         
-        printf("Key %d RRN %ld\nC0 %ld C1 %ld\n", (*promoted)->rec->key, (*promoted)->rec->RRN, (*promoted)->childs[0], (*promoted)->childs[1]);
+        // printf("Key %d RRN %ld\nC0 %ld C1 %ld\n", (*promoted)->rec->key, (*promoted)->rec->RRN, (*promoted)->childs[0], (*promoted)->childs[1]);
         
-        *promoted = NULL; //É necessário atualizar para null, se não todo overflow atualiza a raíz
+        if(!newPage->bPage->isLeaf) { *promoted = NULL; }
         return status;
     }
 
@@ -174,7 +174,6 @@ promotedKey *promoteKey(record *rec, int LeftRRN, int RightRRN) {
     promotedKey *promoted = (promotedKey*)malloc(sizeof(promotedKey));
     promoted->childs[0] = LeftRRN;
     promoted->childs[1] = RightRRN;
-    printf("fio %ld %ld\n", promoted->childs[0], promoted->childs[1]);
     promoted->rec = rec;
     return promoted;
 }
@@ -190,7 +189,6 @@ void bTreeInsertIntoPage(record *newRecord, promotedKey **promoted, newPageInfo 
         FILE *fp = fopen(BTREEFILENAME, "r+");
         fseek(fp, 0, SEEK_END);
         createdPage->RRN = ftell(fp) / PAGESIZE;
-        printf("rrn: %ld\n", createdPage->RRN);
         int insertPlace = 0;
         int maxKeysIsOdd = 0;
         long promotedIndex;

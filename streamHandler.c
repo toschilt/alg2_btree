@@ -82,9 +82,7 @@ long getRecordsInDataFile() {
 void insertNodeInBTreeFile(newPageInfo *newPage, FILE *bFile, long RRN) {
     if(RRN == -1) { fseek(bFile, 0, SEEK_END); } //Caso RRN seja -1, insere no fim
     else { fseek(bFile, RRN * PAGESIZE, SEEK_SET); } //Caso contrário, insere em posição específica
-
-    // printf("Inseri em %ld\n", ftell(bFile) / PAGESIZE);
-
+    
     fwrite(newPage, PAGESIZE, 1, bFile);
     fflush(bFile);
 }
