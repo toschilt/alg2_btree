@@ -1,7 +1,6 @@
 #ifndef __BTREEUTILS_H__
 #define __BTREEUTILS_H__
 
-
 /*
  * Algoritmos e Estruturas de Dados II
  * Autores: Lucas Toschi e Murilo Todão (Grupo 7)
@@ -14,7 +13,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
 
 #define PAGESIZE 4096
 #define MAXKEYS 5

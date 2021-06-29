@@ -15,7 +15,7 @@ int bTreeInsert(record *newRecord) {
     //Chama a função recursiva
 
     if(error == -1) { return error; }
-    //Não foi possível inserir a chave
+    //Não foi possível inserir a chave, registro já existe
 
     if(promoted != NULL) { headerUpdate(promoted, bFile); }
     //Ao fim do processo, se promoted é não nulo, houve overflow na raíz, necessidade de atualizar
@@ -37,9 +37,9 @@ int _bTreeInsert(record *newRecord, bPageInfo *bInfo, promotedKey **promoted) {
     //Encontra o índice da chave na página
 
     //Verifica se o elemento já existe no nó
-    if(insertPoint == MAXKEYS - 1 && bInfo->bPage->records[insertPoint].key == newRecord->key) { 
+    if(insertPoint < MAXKEYS - 1 && bInfo->bPage->records[insertPoint].key == newRecord->key) { 
         //Chave ja existe, retorna erro
-        return -1; 
+        return -1;
     } 
 
     
@@ -50,6 +50,7 @@ int _bTreeInsert(record *newRecord, bPageInfo *bInfo, promotedKey **promoted) {
         status = _bTreeInsert(newRecord, searchPage, promoted);
         //Chama a recursão na subárvore adequada
 
+        if(status == -1) { return -1; } //Ao voltar da recursão, checka se o registro existe
         if(*promoted == NULL) { return 0; } //Inserção realizada com sucesso e sem overflow
 
         //Promoted diferente de nulo, inserção com overflow, necessidade de inserir promoted
