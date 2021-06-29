@@ -1,18 +1,21 @@
 #include "streamHandler.h"
 
-//ATUALIZAR
+
 void readString(char *string, char separator) {
-    char buf;
-    int i = 0;
+    char currentChar;
+    int currentInputIndex = 0;
+
     do {
-        buf = fgetc(stdin); //Lê a próxima entrada
-        string[i] = buf; //Adiciona à string
-        i++;
-    } while(buf != '\n' && buf != EOF && buf != '\0' && buf != separator);
+        currentChar = fgetc(stdin); //Lê a próxima entrada
+        string[currentInputIndex] = currentChar; //Adiciona à string
+        currentInputIndex++;
+    } while(currentChar != '\n' && currentChar != EOF && currentChar != '\0' && currentChar != separator);
     //Enquanto não for lido algum dos acima, a leitura da string continua
-    i--;
-    string[i] = '\0'; //Adiciona o \0 no local devido e retorna
+    
+    currentInputIndex--;
+    string[currentInputIndex] = '\0'; //Adiciona o \0 no local devido e retorna
 }
+
 
 
 studentRegister *searchStudentInDataFile(long RRN) {
@@ -31,13 +34,37 @@ studentRegister *searchStudentInDataFile(long RRN) {
 }
 
 
+static void removeAllChars(char* string, char c) {
+    char *readPointer = string, *writePointer = string;
+    while(*readPointer)
+    {
+        *writePointer = *readPointer++;
+        writePointer += (*writePointer != c);
+    }
+    *writePointer = '\0';
+}
+
 studentRegister *readStudentFromUser() {
     studentRegister *student = (studentRegister*)malloc(getStudentSize());
     char c;
     scanf("%d%c", &student->nusp, &c);
-    readString(student->nome, ',');
-    readString(student->sobrenome, ',');
-    readString(student->curso, ',');
+
+    char tempNome[NOMESIZE];
+    char tempSobrenome[SOBRENOMESIZE];
+    char tempCurso[CURSOSIZE];
+
+    readString(tempNome, ',');
+    readString(tempSobrenome, ',');
+    readString(tempCurso, ',');
+
+    removeAllChars(tempNome, '"');
+    removeAllChars(tempSobrenome, '"');
+    removeAllChars(tempCurso, '"');
+
+    strcpy(student->nome, tempNome);
+    strcpy(student->sobrenome, tempSobrenome);
+    strcpy(student->curso, tempCurso);
+    
     scanf("%f", &student->nota);
     return student;
 }

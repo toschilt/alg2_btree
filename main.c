@@ -1,4 +1,3 @@
-#include "bTreeUtils.h"
 #include "streamHandler.h"
 #include "publicInterface.h"
 #include "student.h"
@@ -8,15 +7,16 @@
 #define INSERTFUNCTIONNAME "insert"
 #define UPDATEFUNCTIONNAME "update"
 
-
 int main(int argc, char *argv[]) {
     char function[20];
 
     //Criação dos documentos binários, pode ser melhorado
-    fopen(BTREEFILENAME, "w"); 
-    fopen(DATAFILENAME, "w");
-    
-    
+    FILE *fp = fopen(BTREEFILENAME, "w");
+    fclose(fp);
+
+    FILE *dataf = fopen(DATAFILENAME, "w");
+    fclose(dataf);
+
     while(1) { //Loop infinito
         readString(function, ' '); //Lê a entrada do usuário, passando o espaço como separador
         
