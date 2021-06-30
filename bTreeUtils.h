@@ -84,12 +84,5 @@ bPageInfo *getOrCreateRoot(FILE *bFile);
 long pageBinarySearch(int searchKey, record *records, long firstSearch, long lastSearch);
 
 
-/*
- * Funções responsáveis por imprimir informações da árvore
-*/
-void printNode(bPageInfo *bPage);
-void printPromoted(promotedKey *promoted);
-void printArray(long *childsArray);
-
 
 #endif

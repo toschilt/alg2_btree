@@ -37,10 +37,5 @@ void insert(studentRegister *student);
 */
 void update(studentRegister *student);
 
-/*
- * Função responsável por imprimir a árvore por completo para o usuário
-*/
-void print();
-
 
 #endif

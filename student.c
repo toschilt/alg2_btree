@@ -11,7 +11,7 @@ int getStudentSize() {
 
 void printStudent(studentRegister *student) {
     //Imprime as informações no formato fornecido
-    printf("−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−\n");
+    printf("-------------------------------\n");
     printf("nUSP: %d\n", student->nusp);
     printf("Nome: %s\n", student->nome);
     printf("Sobrenome: %s\n", student->sobrenome);

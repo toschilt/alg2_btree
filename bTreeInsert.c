@@ -179,9 +179,6 @@ void bTreeInsertIntoPage(record *newRecord, promotedKey **promoted, bPageInfo *b
         
         long *childsArray = NULL; //Vetor para armazenar informações de filhos
 
-        // printf("Imprimindo nó\n");
-        // printNode(bInfo);
-
         if(*promoted != NULL) {
             //Cria um vetor com filhos de bInfo e promoted que será utilizado no fim
             childsArray = createChildsArray(bInfo, *promoted);
@@ -235,9 +232,6 @@ void bTreeInsertIntoPage(record *newRecord, promotedKey **promoted, bPageInfo *b
 
         //Promove rec
         *promoted = promoteKey(rec, bInfo->RRN, createdPage->RRN);
-
-        // printf("Promted:\n");
-        // printPromoted(*promoted);
         
         //Atualização das páginas, adicionar elementos na nova página e remover da antiga
         if(newRecordInsertPlace == 1)
@@ -258,13 +252,7 @@ void bTreeInsertIntoPage(record *newRecord, promotedKey **promoted, bPageInfo *b
         
         else
             cleanPageData(bInfo->bPage, childsArray, promotedIndex);
-        
 
-        // printf("\n\nImprimindo nós após alteração\n");
-        // printf("Filho 1:\n");
-        // printNode(bInfo);
-        // printf("Filho 2\n");
-        // printNode(createdPage);
 
         //Insere o novo registro no nó da direita
         if(newRecordInsertPlace == 1) {
@@ -292,12 +280,6 @@ void bTreeInsertIntoPage(record *newRecord, promotedKey **promoted, bPageInfo *b
         
         //Insere a nova página no arquivo da bTree
         insertNodeInBTreeFile(createdPage, fp, createdPage->RRN);
-
-        // printf("\n\nImprimindo nós após alteração\n");
-        // printf("Filho 1:\n");
-        // printNode(bInfo);
-        // printf("Filho 2\n");
-        // printNode(createdPage);
 
     }
 

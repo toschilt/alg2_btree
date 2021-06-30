@@ -22,7 +22,7 @@ void insert(studentRegister *student) {
     int error = bTreeInsert(rec);
 
     if(error == -1) {
-        printf("O registro já existe\n");
+        printf("O Registro ja existe!\n");
         return;
     }
 
@@ -39,29 +39,4 @@ void update(studentRegister *student) {
     }
 
     updateStudent(student, RRN);
-}
-
-
-
-
-//Funções de impressão, remover
-void printTree(bPageInfo *bInfo) {
-    printf("\n");
-    printNode(bInfo);
-
-    if(!bInfo->bPage->isLeaf) {
-        printf("\n");
-        for(int i = 0; i <= bInfo->bPage->numRecords; i++) {
-            printf("\n");
-            bPageInfo *nP = getPageFromBTreeFile(bInfo->bPage->childs[i]);
-            printTree(nP);
-        }
-    }
-}
-
-
-void print() {
-    FILE *fp = fopen(BTREEFILENAME, "r+");
-    bPageInfo *bInfo = getOrCreateRoot(fp);
-    printTree(bInfo);
 }

@@ -41,9 +41,5 @@ int main(int argc, char *argv[]) {
             student = readStudentFromUser();
             update(student);
         }
-
-        else if(!strcmp(function, "print")) { //Impressão
-            print();
-        }
     }
 }
